@@ -16,6 +16,7 @@ Please report all bugs under issues on this repo. I do check them!
 * Themes
 * More robust sorting and grid layout (album and artist sorting will be done soon)
 * Full screen mode and minimized mode (You can already kinda do this with the resizable window)
+* Repeat button Once/Loop (How did i forget this)
 
 ### Maybe:
 
