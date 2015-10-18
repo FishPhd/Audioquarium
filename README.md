@@ -15,6 +15,7 @@ Please report all bugs under issues on this repo. I do check them!
 * Metdata Editor (All the works)
 * Themes
 * More robust sorting and grid layout (album and artist sorting will be done soon)
+* Full screen mode and minimized mode (You can already kinda do this with the resizable window)
 
 ### Maybe:
 
