@@ -10,6 +10,9 @@ using System.Windows.Threading;
 using Dewritwo.Resources;
 using File = TagLib.File;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using MouseKeyboardActivityMonitor;
+using MouseKeyboardActivityMonitor.WinApi;
+using System.Windows.Forms;
 
 namespace MusicPlayer
 {
@@ -24,9 +27,9 @@ namespace MusicPlayer
         private bool audiouMuted;
         private bool dragStarted;
         private bool shuffleSongs;
+        private readonly KeyboardHookListener m_KeyboardHookManager;
 
         public MainWindow()
-
         {
             InitializeComponent();
             Cfg.Initial(false);
@@ -36,6 +39,10 @@ namespace MusicPlayer
             timer.Interval = TimeSpan.FromSeconds(0.5);
             timer.Tick += timer_Tick;
             timer.Start();
+
+            m_KeyboardHookManager = new KeyboardHookListener(new GlobalHooker());
+            m_KeyboardHookManager.Enabled = true;
+            m_KeyboardHookManager.KeyDown += HookManager_KeyDown;
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -72,10 +79,31 @@ namespace MusicPlayer
             }
         }
 
-        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void HookManager_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-            Console.WriteLine(e.Key);
+            if (e.KeyData.ToString() == Key.MediaPlayPause.ToString())
+                Play();
+            else if (e.KeyData.ToString() == Key.MediaNextTrack.ToString())
+                Next();
+            else if (e.KeyData.ToString() == Key.MediaPreviousTrack.ToString())
+                Previous();
+            else if (e.KeyData.ToString() == Key.VolumeMute.ToString())
+                Mute();
         }
+        
+        /*
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.MediaPlayPause)
+                Play();
+            else if (e.Key == Key.MediaNextTrack)
+                Next();
+            else if (e.Key == Key.MediaPreviousTrack)
+                Previous();
+            else if (e.Key == Key.VolumeMute)
+                Mute();
+        }
+        */
 
         public void Load()
         {
@@ -167,7 +195,7 @@ namespace MusicPlayer
 
         private void btnChange_OnClick(object sender, RoutedEventArgs e)
         {
-            var objname = ((Button) sender).Name;
+            var objname = ((System.Windows.Controls.Button) sender).Name;
             var dialog = new CommonOpenFileDialog();
             dialog.IsFolderPicker = true;
             CommonFileDialogResult result = dialog.ShowDialog();
@@ -187,6 +215,12 @@ namespace MusicPlayer
 
         private void PlayPause_OnClick(object sender, RoutedEventArgs e)
         {
+            Play();
+        }
+
+
+        private void Play()
+        {
             if (mplayer.Source == null && shuffleSongs == false)
             {
                 songDataGrid.SelectedIndex = 0;
@@ -194,7 +228,7 @@ namespace MusicPlayer
 
                 mplayer.Open(new Uri(selectedSong.FileName));
                 mplayer.Play();
-                playPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
+                playPause.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("Pause") };
 
                 audioPlaying = true;
                 GetAlbumart();
@@ -209,7 +243,7 @@ namespace MusicPlayer
 
                 mplayer.Open(new Uri(selectedSong.FileName));
                 mplayer.Play();
-                playPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
+                playPause.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("Pause") };
 
                 audioPlaying = true;
                 GetAlbumart();
@@ -220,18 +254,23 @@ namespace MusicPlayer
             else if (audioPlaying)
             {
                 mplayer.Pause();
-                playPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Play")};
+                playPause.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("Play") };
                 audioPlaying = false;
             }
             else
             {
                 mplayer.Play();
-                playPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
+                playPause.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("Pause") };
                 audioPlaying = true;
             }
         }
 
         private void NextSong_OnClick(object sender, MouseButtonEventArgs e)
+        {
+            Next();
+        }
+
+        private void Next()
         {
             if (shuffleSongs)
                 songDataGrid.SelectedIndex = rnd.Next(0, songDataGrid.Items.Count);
@@ -243,7 +282,7 @@ namespace MusicPlayer
             mplayer.Open(new Uri(selectedSong.FileName));
             mplayer.Play();
             GetAlbumart();
-            playPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
+            playPause.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("Pause") };
 
             audioPlaying = true;
             nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
@@ -253,6 +292,11 @@ namespace MusicPlayer
 
         private void PreviousSong_OnClick(object sender, MouseButtonEventArgs e)
         {
+            Previous();
+        }
+
+        private void Previous()
+        {
             if (songDataGrid.SelectedIndex != 0)
             {
                 songDataGrid.SelectedIndex = songDataGrid.SelectedIndex - 1;
@@ -261,7 +305,7 @@ namespace MusicPlayer
                 mplayer.Open(new Uri(selectedSong.FileName));
                 mplayer.Play();
                 GetAlbumart();
-                playPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
+                playPause.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("Pause") };
 
                 audioPlaying = true;
                 nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
@@ -310,16 +354,21 @@ namespace MusicPlayer
 
         private void Mute_OnClick(object sender, MouseButtonEventArgs e)
         {
+            Mute();
+        }
+
+        private void Mute()
+        {
             if (audiouMuted)
             {
-                mute.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("appbar_sound_2")};
+                mute.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("appbar_sound_2") };
                 mute.Width = 20;
                 mplayer.IsMuted = false;
                 audiouMuted = false;
             }
             else
             {
-                mute.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("appbar_sound_0")};
+                mute.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("appbar_sound_0") };
                 mute.Width = 10;
                 mplayer.IsMuted = true;
                 audiouMuted = true;
