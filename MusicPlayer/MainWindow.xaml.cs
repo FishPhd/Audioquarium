@@ -72,6 +72,11 @@ namespace MusicPlayer
             }
         }
 
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            Console.WriteLine(e.Key);
+        }
+
         public void Load()
         {
             if (Cfg.configFile["Music.Directory1"] != "")

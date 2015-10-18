@@ -2,10 +2,11 @@
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                      Title="Music" Height="380" MinHeight="80" MinWidth="180" Width="900">
+                      Title="Music" Height="380" MinHeight="80" MinWidth="180" Width="900" 
+                      Keyboard.PreviewKeyDown="Window_PreviewKeyDown">
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
-            <Button ToolTip="Launcher Settings" Click="PlayerSettings_OnClick">
+            <Button ToolTip="Settings" Click="PlayerSettings_OnClick">
                 <Rectangle Width="15" Height="15"
                            Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
                     <Rectangle.OpacityMask>
@@ -101,7 +102,22 @@
                     <SolidColorBrush Color="Gray" Opacity="0.7" />
                 </Grid.Background>
                 <StackPanel Orientation="Horizontal">
-                    <Rectangle x:Name="shuffle" Width="20" Height="18" Margin="30,0,0,0" ToolTip="Shuffle"
+                    <Rectangle x:Name="loop" Width="20" Height="15" Margin="20,-2,0,0" ToolTip="Loop">
+                        <Rectangle.OpacityMask>
+                            <VisualBrush Visual="{StaticResource appbar_loop}" />
+                        </Rectangle.OpacityMask>
+                        <Rectangle.Style>
+                            <Style TargetType="{x:Type Rectangle}">
+                                <Setter Property="Fill" Value="White" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Fill" Value="LightGray" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Rectangle.Style>
+                    </Rectangle>
+                    <Rectangle x:Name="shuffle" Width="20" Height="18" Margin="20,0,0,0" ToolTip="Shuffle"
                                MouseDown="Shuffle_OnClick">
                         <Rectangle.OpacityMask>
                             <VisualBrush Visual="{StaticResource Shuffle}" />
@@ -117,7 +133,8 @@
                             </Style>
                         </Rectangle.Style>
                     </Rectangle>
-                    <Rectangle x:Name="mute" Width="20" Height="15" Margin="35,0,0,0" ToolTip="Mute"
+                   
+                    <Rectangle x:Name="mute" Width="20" Height="15" Margin="20,0,0,0" ToolTip="Mute"
                                MouseDown="Mute_OnClick">
                         <Rectangle.OpacityMask>
                             <VisualBrush Visual="{StaticResource appbar_sound_2}" />
@@ -134,7 +151,7 @@
                         </Rectangle.Style>
                     </Rectangle>
                 </StackPanel>
-                <Grid Width="Auto" Margin="120,0,0,0">
+                <Grid Width="Auto" Margin="130,0,0,0">
                     <Slider x:Name="volumeSlider" IsMoveToPointEnabled="True"
                             ValueChanged="VolumeSlider_OnValueChanged" Style="{DynamicResource FlatSlider}" Value="0.7"
                             Margin="0,0,10,0" Width="Auto" Foreground="#CCFFFFFF" Maximum="1" LargeChange="0.1"
