@@ -28,6 +28,7 @@ namespace MusicPlayer
         private bool dragStarted;
         private bool shuffleSongs;
         private readonly KeyboardHookListener m_KeyboardHookManager;
+        private bool repeatSong;
 
         public MainWindow()
         {
@@ -66,7 +67,11 @@ namespace MusicPlayer
                 Convert.ToInt32(mplayer.Position.TotalSeconds) ==
                 Convert.ToInt32(mplayer.NaturalDuration.TimeSpan.TotalSeconds))
             {
-                songDataGrid.SelectedIndex = songDataGrid.SelectedIndex + 1;
+                if(!repeatSong)
+                    songDataGrid.SelectedIndex = songDataGrid.SelectedIndex + 1;
+                else
+                    songDataGrid.SelectedIndex = songDataGrid.SelectedIndex;
+
                 var selectedSong = songDataGrid.SelectedItem as Itemsource.Songs;
 
                 mplayer.Open(new Uri(selectedSong.FileName));
@@ -74,8 +79,8 @@ namespace MusicPlayer
 
                 audioPlaying = true;
                 nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
-                nowPlayingAlbum.Content = selectedSong.Album;
-                nowPlayingTrack.Content = selectedSong.Track;
+                nowPlayingAlbum.Text = selectedSong.Album;
+                nowPlayingTrack.Text = selectedSong.Track;
             }
         }
 
@@ -90,20 +95,7 @@ namespace MusicPlayer
             else if (e.KeyData.ToString() == Key.VolumeMute.ToString())
                 Mute();
         }
-        
-        /*
-        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.MediaPlayPause)
-                Play();
-            else if (e.Key == Key.MediaNextTrack)
-                Next();
-            else if (e.Key == Key.MediaPreviousTrack)
-                Previous();
-            else if (e.Key == Key.VolumeMute)
-                Mute();
-        }
-        */
+       
 
         public void Load()
         {
@@ -135,8 +127,8 @@ namespace MusicPlayer
             GetAlbumart();
 
             nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
-            nowPlayingAlbum.Content = selectedSong.Album;
-            nowPlayingTrack.Content = selectedSong.Track;
+            nowPlayingAlbum.Text = selectedSong.Album;
+            nowPlayingTrack.Text = selectedSong.Track;
             playPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
         }
 
@@ -233,8 +225,8 @@ namespace MusicPlayer
                 audioPlaying = true;
                 GetAlbumart();
                 nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
-                nowPlayingAlbum.Content = selectedSong.Album;
-                nowPlayingTrack.Content = selectedSong.Track;
+                nowPlayingAlbum.Text = selectedSong.Album;
+                nowPlayingTrack.Text = selectedSong.Track;
             }
             else if (mplayer.Source == null && shuffleSongs)
             {
@@ -248,8 +240,8 @@ namespace MusicPlayer
                 audioPlaying = true;
                 GetAlbumart();
                 nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
-                nowPlayingAlbum.Content = selectedSong.Album;
-                nowPlayingTrack.Content = selectedSong.Track;
+                nowPlayingAlbum.Text = selectedSong.Album;
+                nowPlayingTrack.Text = selectedSong.Track;
             }
             else if (audioPlaying)
             {
@@ -286,8 +278,8 @@ namespace MusicPlayer
 
             audioPlaying = true;
             nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
-            nowPlayingAlbum.Content = selectedSong.Album;
-            nowPlayingTrack.Content = selectedSong.Track;
+            nowPlayingAlbum.Text = selectedSong.Album;
+            nowPlayingTrack.Text = selectedSong.Track;
         }
 
         private void PreviousSong_OnClick(object sender, MouseButtonEventArgs e)
@@ -309,8 +301,8 @@ namespace MusicPlayer
 
                 audioPlaying = true;
                 nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
-                nowPlayingAlbum.Content = selectedSong.Album;
-                nowPlayingTrack.Content = selectedSong.Track;
+                nowPlayingAlbum.Text = selectedSong.Album;
+                nowPlayingTrack.Text = selectedSong.Track;
             }
         }
 
@@ -389,6 +381,20 @@ namespace MusicPlayer
             }
         }
 
-        
+        private void Repeat_OnClick(object sender, MouseButtonEventArgs e)
+        {
+            if (repeatSong)
+            {
+                repeatSong = false;
+                repeat.Fill = Brushes.White;
+            }
+            else
+            {
+                repeatSong = true;
+                repeat.Fill = (Brush)FindResource("AccentColorBrush");
+            }
+        }
+
+
     }
 }

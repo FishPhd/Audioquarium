@@ -19,8 +19,8 @@
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
             <Controls:Flyout Header="Flyout" Position="Right" IsOpen="False" x:Name="Flyout" Theme="Adapt">
-            <Grid x:Name="settingsGrid" Margin="10">
-                <StackPanel Orientation="Vertical">
+                <Grid x:Name="settingsGrid" Margin="10">
+                    <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal" Margin="0,10,0,0" VerticalAlignment="Top" Height="30">
                             <Label>Music Directory:</Label>
                             <TextBox x:Name="directory1" IsReadOnly="True" Controls:TextBoxHelper.Watermark="None" Margin="10,0,0,0"
@@ -63,9 +63,9 @@
                                 BorderBrush="{x:Null}" />
                     </StackPanel>
                     -->
-                    
-                </StackPanel>
-            </Grid>
+
+                    </StackPanel>
+                </Grid>
             </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>
@@ -80,15 +80,17 @@
         </Grid.ColumnDefinitions>
 
         <Grid x:Name="albumGrid">
-            <Image x:Name="albumArt" VerticalAlignment="Bottom" />
 
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="5,0,0,270">
-                <Label x:Name="nowPlayingAlbum">Album</Label>
-                <Label x:Name="nowPlayingTrack" Opacity="0.5">Track</Label>
-            </StackPanel>
 
-            <Grid>
-                <Rectangle x:Name="placeholder" Width="125" Height="150" VerticalAlignment="Bottom" Margin="0,0,20,86"
+            <Grid VerticalAlignment="Bottom">
+                <Grid>
+                    <Image x:Name="albumArt" MinHeight="297" Stretch="Uniform" VerticalAlignment="Bottom"/>
+                    <StackPanel Orientation="Vertical" Margin="5,5,0,0">
+                        <TextBlock FontSize="14" x:Name="nowPlayingAlbum">Album</TextBlock>
+                        <TextBlock FontSize="14" x:Name="nowPlayingTrack" Opacity="0.5">Track</TextBlock>
+                    </StackPanel>
+                </Grid>
+                <Rectangle x:Name="placeholder" Width="125" Height="150" Margin="0,0,20,0"
                            Fill="{DynamicResource AccentColorBrush}" ToolTip="Shuffle" MouseDown="Shuffle_OnClick">
                     <Rectangle.OpacityMask>
                         <VisualBrush Visual="{StaticResource appbar_music}" />
@@ -101,7 +103,8 @@
                     <SolidColorBrush Color="Gray" Opacity="0.7" />
                 </Grid.Background>
                 <StackPanel Orientation="Horizontal">
-                    <Rectangle x:Name="loop" Width="20" Height="15" Margin="20,-2,0,0" ToolTip="Loop">
+                    <Rectangle x:Name="repeat" Width="20" Height="15" Margin="20,-2,0,0" ToolTip="Loop"
+                               MouseDown="Repeat_OnClick">
                         <Rectangle.OpacityMask>
                             <VisualBrush Visual="{StaticResource appbar_loop}" />
                         </Rectangle.OpacityMask>
@@ -132,7 +135,7 @@
                             </Style>
                         </Rectangle.Style>
                     </Rectangle>
-                   
+
                     <Rectangle x:Name="mute" Width="20" Height="15" Margin="20,0,0,0" ToolTip="Mute"
                                MouseDown="Mute_OnClick">
                         <Rectangle.OpacityMask>
