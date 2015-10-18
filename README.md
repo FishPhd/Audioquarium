@@ -2,6 +2,8 @@
 
 ## Super Lightweight Audio Player, No BS
 
+![alt tag](http://i.imgur.com/ZTMuZap.png)
+
 Hit the settings icon to add your music directory, everything else should be common sense.
 
 Working filetypes: aac,wav,mp3,flac, probably others im too lazy to test
