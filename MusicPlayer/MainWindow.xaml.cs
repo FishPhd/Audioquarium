@@ -109,30 +109,29 @@ namespace MusicPlayer
 
         private void GetAlbumart()
         {
-            var selectedSong = songDataGrid.SelectedItem as Itemsource.Songs;
-            var tagFile = File.Create(selectedSong.FileName);
-
-            // Load you image data in MemoryStream
-            var pic = tagFile.Tag.Pictures[0];
-            var ms = new MemoryStream(pic.Data.Data);
-            ms.Seek(0, SeekOrigin.Begin);
-
-            // ImageSource for System.Windows.Controls.Image
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.StreamSource = ms;
-            bitmap.EndInit();
-
-            // Create a System.Windows.Controls.Image control
-            var img = new Image();
-            img.Source = bitmap;
-
-            if (img.Source == null)
-                placeholder.Visibility = Visibility.Visible;
-            else
+            try
             {
+                var selectedSong = songDataGrid.SelectedItem as Itemsource.Songs;
+                var tagFile = File.Create(selectedSong.FileName);
+
+                var pic = tagFile.Tag.Pictures[0];
+                var ms = new MemoryStream(pic.Data.Data);
+                ms.Seek(0, SeekOrigin.Begin);
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.StreamSource = ms;
+                bitmap.EndInit();
+
+                var img = new Image();
+                img.Source = bitmap;
                 albumArt.Source = img.Source;
                 placeholder.Visibility = Visibility.Hidden;
+            }
+            catch
+            {
+                albumArt.Source = null;
+                placeholder.Visibility = Visibility.Visible;
             }
         }
 
