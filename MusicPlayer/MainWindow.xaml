@@ -63,7 +63,7 @@
                 <RowDefinition Height="298*"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0">
+            <Grid Grid.Row="0" Height="Auto">
                 <StackPanel Orientation="Vertical">
                     <Button x:Name="albumSorting" Foreground="LightGray" Height="57" Style="{StaticResource AccentedSquareButtonStyle}"
                                 Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"

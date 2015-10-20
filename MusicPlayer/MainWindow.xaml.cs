@@ -74,15 +74,18 @@ namespace MusicPlayer
                 Convert.ToInt32(mplayer.Position.TotalSeconds) ==
                 Convert.ToInt32(mplayer.NaturalDuration.TimeSpan.TotalSeconds))
             {
-                if(!repeatSong)
-                    songDataGrid.SelectedIndex = songDataGrid.SelectedIndex + 1;
-                else
+                if(shuffleSongs)
+                    songDataGrid.SelectedIndex = rnd.Next(0, songDataGrid.Items.Count);
+                else if(repeatSong)
                     songDataGrid.SelectedIndex = songDataGrid.SelectedIndex;
+                else
+                    songDataGrid.SelectedIndex = songDataGrid.SelectedIndex + 1;
 
                 var selectedSong = songDataGrid.SelectedItem as Itemsource.Songs;
 
                 mplayer.Open(new Uri(selectedSong.FileName));
                 mplayer.Play();
+                GetAlbumart();
 
                 audioPlaying = true;
                 if (selectedSong.Name == null)
