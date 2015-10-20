@@ -12,7 +12,9 @@ using File = TagLib.File;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using MouseKeyboardActivityMonitor;
 using MouseKeyboardActivityMonitor.WinApi;
-using System.Windows.Forms;
+using System.ComponentModel;
+using System.Data;
+using System.Windows.Data;
 
 namespace MusicPlayer
 {
@@ -226,6 +228,63 @@ namespace MusicPlayer
             Mute();
         }
 
+        private void SongSorting_OnClick(object sender, RoutedEventArgs e)
+        {
+            Sort("Name");
+            songSorting.Background = Brushes.LightGray;
+
+            songSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
+            songSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
+
+            albumSorting.Background = Brushes.Transparent;
+            albumSortingIcon.Fill = Brushes.LightGray;
+            albumSortingLabel.Foreground = Brushes.LightGray;
+            artistSorting.Background = Brushes.Transparent;
+            artistSortingIcon.Fill = Brushes.LightGray;
+            artistSortingLabel.Foreground = Brushes.LightGray;
+        }
+
+        private void AlbumSorting_OnClick(object sender, RoutedEventArgs e)
+        {
+            Sort("Album");
+            albumSorting.Background = Brushes.LightGray;
+
+            albumSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
+            albumSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
+
+            songSorting.Background = Brushes.Transparent;
+            songSortingIcon.Fill = Brushes.LightGray;
+            songSortingLabel.Foreground = Brushes.LightGray;
+            artistSorting.Background = Brushes.Transparent;
+            artistSortingIcon.Fill = Brushes.LightGray;
+            artistSortingLabel.Foreground = Brushes.LightGray;
+        }
+
+        private void ArtistSorting_OnClick(object sender, RoutedEventArgs e)
+        {
+            Sort("Artist");
+            artistSorting.Background = Brushes.LightGray;
+
+            artistSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
+            artistSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
+
+            songSorting.Background = Brushes.Transparent;
+            songSortingIcon.Fill = Brushes.LightGray;
+            songSortingLabel.Foreground = Brushes.LightGray;
+            albumSorting.Background = Brushes.Transparent;
+            albumSortingIcon.Fill = Brushes.LightGray;
+            albumSortingLabel.Foreground = Brushes.LightGray;
+
+        }
+
+        private void Sort(string column)
+        {
+            ICollectionView view = CollectionViewSource.GetDefaultView(songDataGrid.ItemsSource);
+            view.SortDescriptions.Clear();
+            view.SortDescriptions.Add(new SortDescription(column, ListSortDirection.Ascending));
+            view.Refresh();
+        }
+
         private void Next()
         {
             if (shuffleSongs)
@@ -402,5 +461,7 @@ namespace MusicPlayer
         }
 
         #endregion
+
+        
     }
 }
