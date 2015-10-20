@@ -63,7 +63,10 @@ namespace MusicPlayer
                 if (!dragStarted)
                 {
                     scrubBar.Value = mplayer.Position.TotalSeconds;
-                    scrubTime.Content = mplayer.Position.ToString(@"mm\:ss") + " - " + selectedSong.Length;
+                    if (selectedSong != null)
+                    {
+                        scrubTime.Content = mplayer.Position.ToString(@"mm\:ss") + " - " + selectedSong.Length;
+                    }
                 }
             }
 

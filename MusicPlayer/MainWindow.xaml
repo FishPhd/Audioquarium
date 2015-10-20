@@ -65,7 +65,7 @@
 
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Vertical">
-                    <Button x:Name="albumSorting" Foreground="LightGray" Height="55" Style="{StaticResource AccentedSquareButtonStyle}"
+                    <Button x:Name="albumSorting" Foreground="LightGray" Height="57" Style="{StaticResource AccentedSquareButtonStyle}"
                                 Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
                                 BorderBrush="{x:Null}" Click="AlbumSorting_OnClick" ToolTip="Sort by Album Name">
                         <Button.Content>
@@ -81,7 +81,7 @@
                         </Button.Content>
                     </Button>
 
-                    <Button x:Name="artistSorting" Height="55" Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
+                    <Button x:Name="artistSorting" Height="57" Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
                                 BorderBrush="{x:Null}" Click="ArtistSorting_OnClick" ToolTip="Sort by Artist Name" Style="{StaticResource AccentedSquareButtonStyle}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
@@ -95,7 +95,7 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-                    <Button Foreground="LightGray" x:Name="songSorting" Height="55" Click="SongSorting_OnClick" Style="{StaticResource AccentedSquareButtonStyle}"
+                    <Button Foreground="LightGray" x:Name="songSorting" Height="56" Click="SongSorting_OnClick" Style="{StaticResource AccentedSquareButtonStyle}"
                                 Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
                                 BorderBrush="{x:Null}" ToolTip="Sort by Song Name">
                         <Button.Content>
