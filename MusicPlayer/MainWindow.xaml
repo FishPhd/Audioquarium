@@ -3,7 +3,7 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:local="clr-namespace:MusicPlayer"
-                      Title="Music" Height="538" MinHeight="80" MinWidth="180" Width="900" >
+                      Title="Music" Height="548" MinHeight="80" MinWidth="180" Width="900" >
     <Controls:MetroWindow.Resources>
         <ObjectDataProvider x:Key="Color" ObjectType="{x:Type local:Dictionaries}" MethodName="GetColor" />
     </Controls:MetroWindow.Resources>
@@ -65,11 +65,11 @@
 
             <Grid Grid.Row="0">
                 <StackPanel Orientation="Vertical">
-                    <Button x:Name="albumSorting" Foreground="LightGray" Height="50" Style="{StaticResource AccentedSquareButtonStyle}"
+                    <Button x:Name="albumSorting" Foreground="LightGray" Height="55" Style="{StaticResource AccentedSquareButtonStyle}"
                                 Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
                                 BorderBrush="{x:Null}" Click="AlbumSorting_OnClick" ToolTip="Sort by Album Name">
                         <Button.Content>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0" >
                                 <Rectangle x:Name="albumSortingIcon" Width="30" Height="40" Margin="0,0,0,0"
                                         Fill="LightGray">
                                     <Rectangle.OpacityMask>
@@ -84,7 +84,7 @@
                     <Button x:Name="artistSorting" Height="55" Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
                                 BorderBrush="{x:Null}" Click="ArtistSorting_OnClick" ToolTip="Sort by Artist Name" Style="{StaticResource AccentedSquareButtonStyle}">
                         <Button.Content>
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                                 <Rectangle x:Name="artistSortingIcon"  Width="30" Height="30" Margin="0,0,0,0"
                                         Fill="LightGray">
                                     <Rectangle.OpacityMask>
@@ -99,7 +99,7 @@
                                 Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
                                 BorderBrush="{x:Null}" ToolTip="Sort by Song Name">
                         <Button.Content>
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                                 <Rectangle  x:Name="songSortingIcon" Width="30" Height="35" Margin="0,0,0,0"
                                         Fill="LightGray">
                                     <Rectangle.OpacityMask>
@@ -264,7 +264,7 @@
                     <DataGridTextColumn MinWidth="100" Width="150" Header="Artist" Binding="{Binding Artist}" />
                     <DataGridTextColumn Width="150" Header="Album" Binding="{Binding Album}" />
                     <DataGridTextColumn Width="60" Header="Track" Binding="{Binding Track}" />
-                    <DataGridTextColumn Width="*" Header="Length" Binding="{Binding Length}" />
+                    <DataGridTextColumn Width="50" Header="Length" Binding="{Binding Length}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
