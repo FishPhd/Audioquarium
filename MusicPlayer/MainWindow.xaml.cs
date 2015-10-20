@@ -15,6 +15,8 @@ using MouseKeyboardActivityMonitor.WinApi;
 using System.ComponentModel;
 using System.Data;
 using System.Windows.Data;
+using MahApps.Metro;
+using MahApps.Metro.Controls;
 
 namespace MusicPlayer
 {
@@ -113,6 +115,8 @@ namespace MusicPlayer
                 songDataGrid.ItemsSource = null;
             }
 
+            ThemeManager.ChangeAppStyle(Application.Current, ThemeManager.GetAccent(Cfg.configFile["Player.Color"]), ThemeManager.GetAppTheme("BaseDark"));
+            Colors.SelectedValue = Cfg.configFile["Player.Color"];
             directory1.Text = Cfg.configFile["Music.Directory1"];
         }
 
@@ -209,6 +213,22 @@ namespace MusicPlayer
         }
 
 
+        #region Settings
+
+
+        private void Color_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!IsLoaded)
+            {
+                return;
+            }
+            ThemeManager.ChangeAppStyle(Application.Current, ThemeManager.GetAccent(Colors.SelectedValue.ToString()), ThemeManager.GetAppTheme("BaseDark"));
+            Cfg.configFile["Player.Color"] = Colors.SelectedValue.ToString();
+            Cfg.SaveConfigFile("music_prefs.cfg", Cfg.configFile);
+        }
+
+        #endregion
+
         #region Controls
 
         private void PlayPause_OnClick(object sender, RoutedEventArgs e)
@@ -233,59 +253,109 @@ namespace MusicPlayer
 
         private void SongSorting_OnClick(object sender, RoutedEventArgs e)
         {
-            Sort("Name");
-            songSorting.Background = Brushes.LightGray;
+            if (songSorting.Background != Brushes.LightGray)
+            {
+                Sort("Name");
+                songSorting.Background = Brushes.LightGray;
+                songSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
+                songSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
 
-            songSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
-            songSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
+                albumSorting.ClearValue(BackgroundProperty);
+                albumSortingIcon.Fill = Brushes.LightGray;
+                albumSortingLabel.Foreground = Brushes.LightGray;
+                artistSorting.ClearValue(BackgroundProperty);
+                artistSortingIcon.Fill = Brushes.LightGray;
+                artistSortingLabel.Foreground = Brushes.LightGray;
+            }
+            else
+            {
+                Load();
+                albumSorting.ClearValue(BackgroundProperty);
+                albumSortingIcon.Fill = Brushes.LightGray;
+                albumSortingLabel.Foreground = Brushes.LightGray;
+                songSorting.ClearValue(BackgroundProperty);
+                songSortingIcon.Fill = Brushes.LightGray;
+                songSortingLabel.Foreground = Brushes.LightGray;
+                artistSorting.ClearValue(BackgroundProperty);
+                artistSortingIcon.Fill = Brushes.LightGray;
+                artistSortingLabel.Foreground = Brushes.LightGray;
+            }
 
-            albumSorting.Background = Brushes.Transparent;
-            albumSortingIcon.Fill = Brushes.LightGray;
-            albumSortingLabel.Foreground = Brushes.LightGray;
-            artistSorting.Background = Brushes.Transparent;
-            artistSortingIcon.Fill = Brushes.LightGray;
-            artistSortingLabel.Foreground = Brushes.LightGray;
         }
 
         private void AlbumSorting_OnClick(object sender, RoutedEventArgs e)
         {
-            Sort("Album");
-            albumSorting.Background = Brushes.LightGray;
 
-            albumSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
-            albumSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
+            if (albumSorting.Background != Brushes.LightGray)
+            {
+                Sort("Album");
+                albumSorting.Background = Brushes.LightGray;
+                albumSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
+                albumSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
 
-            songSorting.Background = Brushes.Transparent;
-            songSortingIcon.Fill = Brushes.LightGray;
-            songSortingLabel.Foreground = Brushes.LightGray;
-            artistSorting.Background = Brushes.Transparent;
-            artistSortingIcon.Fill = Brushes.LightGray;
-            artistSortingLabel.Foreground = Brushes.LightGray;
+                songSorting.ClearValue(BackgroundProperty);
+                songSortingIcon.Fill = Brushes.LightGray;
+                songSortingLabel.Foreground = Brushes.LightGray;
+                artistSorting.ClearValue(BackgroundProperty);
+                artistSortingIcon.Fill = Brushes.LightGray;
+                artistSortingLabel.Foreground = Brushes.LightGray;
+            }
+            else
+            {
+                Load();
+                albumSorting.ClearValue(BackgroundProperty);
+                albumSortingIcon.Fill = Brushes.LightGray;
+                albumSortingLabel.Foreground = Brushes.LightGray;
+                songSorting.ClearValue(BackgroundProperty);
+                songSortingIcon.Fill = Brushes.LightGray;
+                songSortingLabel.Foreground = Brushes.LightGray;
+                artistSorting.ClearValue(BackgroundProperty);
+                artistSortingIcon.Fill = Brushes.LightGray;
+                artistSortingLabel.Foreground = Brushes.LightGray;
+            }
         }
 
         private void ArtistSorting_OnClick(object sender, RoutedEventArgs e)
         {
-            Sort("Artist");
-            artistSorting.Background = Brushes.LightGray;
+            if (artistSorting.Background != Brushes.LightGray)
+            {
+                Sort("Artist");
+                artistSorting.Background = Brushes.LightGray;
 
-            artistSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
-            artistSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
+                artistSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
+                artistSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
 
-            songSorting.Background = Brushes.Transparent;
-            songSortingIcon.Fill = Brushes.LightGray;
-            songSortingLabel.Foreground = Brushes.LightGray;
-            albumSorting.Background = Brushes.Transparent;
-            albumSortingIcon.Fill = Brushes.LightGray;
-            albumSortingLabel.Foreground = Brushes.LightGray;
-
+                songSorting.ClearValue(BackgroundProperty);
+                songSortingIcon.Fill = Brushes.LightGray;
+                songSortingLabel.Foreground = Brushes.LightGray;
+                albumSorting.ClearValue(BackgroundProperty);
+                albumSortingIcon.Fill = Brushes.LightGray;
+                albumSortingLabel.Foreground = Brushes.LightGray;
+            }
+            else
+            {
+                Load();
+                albumSorting.ClearValue(BackgroundProperty);
+                albumSortingIcon.Fill = Brushes.LightGray;
+                albumSortingLabel.Foreground = Brushes.LightGray;
+                songSorting.ClearValue(BackgroundProperty);
+                songSortingIcon.Fill = Brushes.LightGray;
+                songSortingLabel.Foreground = Brushes.LightGray;
+                artistSorting.ClearValue(BackgroundProperty);
+                artistSortingIcon.Fill = Brushes.LightGray;
+                artistSortingLabel.Foreground = Brushes.LightGray;
+            }
         }
 
         private void Sort(string column)
         {
-            ICollectionView view = CollectionViewSource.GetDefaultView(songDataGrid.ItemsSource);
-            view.SortDescriptions.Clear();
-            view.SortDescriptions.Add(new SortDescription(column, ListSortDirection.Ascending));
-            view.Refresh();
+            if (songDataGrid.ItemsSource != null)
+            {
+                ICollectionView view = CollectionViewSource.GetDefaultView(songDataGrid.ItemsSource);
+                view.SortDescriptions.Clear();
+                view.SortDescriptions.Add(new SortDescription(column, ListSortDirection.Ascending));
+                view.Refresh();
+            }
         }
 
         private void Next()
