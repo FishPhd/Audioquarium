@@ -118,23 +118,26 @@ namespace MusicPlayer
 
         private void SongGrid_OnLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            mplayer.Close();
-            var selectedSong = songDataGrid.CurrentItem as Itemsource.Songs;
+            if (songDataGrid.ItemsSource != null)
+            {
+                mplayer.Close();
+                var selectedSong = songDataGrid.CurrentItem as Itemsource.Songs;
 
-            mplayer.Open(new Uri(selectedSong.FileName));
-            Console.WriteLine(selectedSong.FileName);
-            mplayer.Play();
-            audioPlaying = true;
-            GetAlbumart();
+                mplayer.Open(new Uri(selectedSong.FileName));
+                Console.WriteLine(selectedSong.FileName);
+                mplayer.Play();
+                audioPlaying = true;
+                GetAlbumart();
 
-            if(selectedSong.Name == null)
-                nowPlayingSong.Content = selectedSong.AltName + " - " + selectedSong.Artist;
-            else
-                nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
+                if (selectedSong.Name == null)
+                    nowPlayingSong.Content = selectedSong.AltName + " - " + selectedSong.Artist;
+                else
+                    nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
 
-            nowPlayingAlbum.Text = selectedSong.Album;
-            nowPlayingTrack.Text = selectedSong.Track;
-            playPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
+                nowPlayingAlbum.Text = selectedSong.Album;
+                nowPlayingTrack.Text = selectedSong.Track;
+                playPause.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("Pause") };
+            }
         }
 
         private void GetAlbumart()
