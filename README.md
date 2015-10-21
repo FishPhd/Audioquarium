@@ -19,6 +19,7 @@ Please report all bugs under issues on this repo. I do check them!
 ### Done:
 * Themes
 * Repeat button Once/Loop
+
 ### Maybe:
 
 * Online metadata recieving (this usually causes more problems than answers)
