@@ -65,48 +65,105 @@
 
             <Grid Grid.Row="0" Height="Auto">
                 <StackPanel Orientation="Vertical">
-                    <Button x:Name="albumSorting" Foreground="LightGray" Height="57" Style="{StaticResource AccentedSquareButtonStyle}"
+                    <Button x:Name="albumSorting" Foreground="LightGray" Height="57"
                                 Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
                                 BorderBrush="{x:Null}" Click="AlbumSorting_OnClick" ToolTip="Sort by Album Name">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Background" Value="#FF252525"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Border Background="{TemplateBinding Background}">
+                                                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource GrayBrush2}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
                         <Button.Content>
                             <StackPanel Orientation="Horizontal" Margin="10,0,0,0" >
                                 <Rectangle x:Name="albumSortingIcon" Width="30" Height="40" Margin="0,0,0,0"
-                                        Fill="LightGray">
+                                        Fill="{DynamicResource GrayBrush6}">
                                     <Rectangle.OpacityMask>
                                         <VisualBrush Visual="{StaticResource Music}" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
-                                <Label x:Name="albumSortingLabel" Foreground="LightGray" Margin="5,5,0,0">Albums</Label>
+                                <Label x:Name="albumSortingLabel" FontSize="14" Foreground="{DynamicResource GrayBrush6}" Margin="5,5,0,0">Albums</Label>
                             </StackPanel>
                         </Button.Content>
                     </Button>
 
                     <Button x:Name="artistSorting" Height="57" Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
-                                BorderBrush="{x:Null}" Click="ArtistSorting_OnClick" ToolTip="Sort by Artist Name" Style="{StaticResource AccentedSquareButtonStyle}">
+                                BorderBrush="{x:Null}" Click="ArtistSorting_OnClick" ToolTip="Sort by Artist Name">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Background" Value="#FF252525"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Border Background="{TemplateBinding Background}">
+                                                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource GrayBrush2}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
                         <Button.Content>
                             <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                                 <Rectangle x:Name="artistSortingIcon"  Width="30" Height="30" Margin="0,0,0,0"
-                                        Fill="LightGray">
+                                        Fill="{DynamicResource GrayBrush6}">
                                     <Rectangle.OpacityMask>
                                         <VisualBrush Visual="{StaticResource Modern_Mic}" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
-                                <Label x:Name="artistSortingLabel" Foreground="LightGray" Margin="5,0,0,0">Artists</Label>
+                                <Label x:Name="artistSortingLabel" FontSize="14" Foreground="{DynamicResource GrayBrush6}" Margin="5,0,0,0">Artists</Label>
                             </StackPanel>
                         </Button.Content>
                     </Button>
-                    <Button Foreground="LightGray" x:Name="songSorting" Height="56" Click="SongSorting_OnClick" Style="{StaticResource AccentedSquareButtonStyle}"
+                    <Button Foreground="{DynamicResource AccentColorBrush}" x:Name="songSorting" Height="56" Click="SongSorting_OnClick"
                                 Controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
                                 BorderBrush="{x:Null}" ToolTip="Sort by Song Name">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Background" Value="#FF252525"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Border Background="{TemplateBinding Background}">
+                                                <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource GrayBrush2}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
                         <Button.Content>
                             <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                                 <Rectangle  x:Name="songSortingIcon" Width="30" Height="35" Margin="0,0,0,0"
-                                        Fill="LightGray">
+                                        Fill="{DynamicResource AccentColorBrush}">
                                     <Rectangle.OpacityMask>
                                         <VisualBrush Visual="{StaticResource appbar_music}" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
-                                <Label x:Name="songSortingLabel" Foreground="LightGray" Margin="5,0,0,0">Songs</Label>
+                                <Label x:Name="songSortingLabel" Foreground="{DynamicResource AccentColorBrush}" Margin="5,0,0,0" FontSize="14">Songs</Label>
                             </StackPanel>
                         </Button.Content>
                     </Button>
@@ -120,7 +177,7 @@
                         <TextBlock FontSize="14" x:Name="nowPlayingTrack" Opacity="0.5">Track</TextBlock>
                     </StackPanel>
                 </Grid>
-                <Rectangle x:Name="placeholder" Width="125" Height="150" Margin="0,0,20,0"
+                <Rectangle x:Name="placeholder" VerticalAlignment="Center" HorizontalAlignment="Center" Width="125" Height="150" Margin="0,0,20,0"
                            Fill="{DynamicResource AccentColorBrush}">
                     <Rectangle.OpacityMask>
                         <VisualBrush Visual="{StaticResource appbar_music}" />
@@ -264,9 +321,13 @@
                     <DataGridTextColumn MinWidth="100" Width="150" Header="Artist" Binding="{Binding Artist}" />
                     <DataGridTextColumn Width="150" Header="Album" Binding="{Binding Album}" />
                     <DataGridTextColumn Width="60" Header="Track" Binding="{Binding Track}" />
-                    <DataGridTextColumn Width="50" Header="Length" Binding="{Binding Length}" />
+                    <DataGridTextColumn Width="*" Header="Length" Binding="{Binding Length}" />
                 </DataGrid.Columns>
             </DataGrid>
+            <ScrollViewer x:Name="scrollViewer" Visibility="Hidden" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <WrapPanel x:Name="albumWrapPanel" VerticalAlignment="Center" HorizontalAlignment="Center">
+                </WrapPanel>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </Controls:MetroWindow>

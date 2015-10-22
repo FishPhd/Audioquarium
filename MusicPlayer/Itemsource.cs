@@ -8,12 +8,13 @@ namespace MusicPlayer
 {
     internal class Itemsource
     {
+        public static List<Songs> info = new List<Songs>();
 
-        public static List<Songs> LoadSongs(string path)
+        public static void LoadSongs(string path)
         {
+            info.Clear();
             var d = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories)
                 .Where(s => s.EndsWith(".mp3") || s.EndsWith(".wav") || s.EndsWith(".aac") || s.EndsWith(".flac"));
-            var info = new List<Songs>();
 
             foreach (var file in d)
             {
@@ -72,7 +73,6 @@ namespace MusicPlayer
                     });
                 }
             }
-            return info;
         }
 
         public class Songs
