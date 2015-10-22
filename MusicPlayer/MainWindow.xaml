@@ -169,13 +169,11 @@
                     </Button>
                 </StackPanel>
             </Grid>
-            <Grid VerticalAlignment="Bottom" Grid.RowSpan="2">
+            <Grid Grid.Row="1">
                 <Grid>
-                    <Image x:Name="albumArt" MinHeight="297" Stretch="Uniform" VerticalAlignment="Bottom"/>
-                    <StackPanel x:Name="topAlbumInfo" Orientation="Vertical" Margin="5,5,0,252">
-                        <TextBlock FontSize="14" x:Name="nowPlayingAlbum">Album</TextBlock>
-                        <TextBlock FontSize="14" x:Name="nowPlayingTrack" Opacity="0.5">Track</TextBlock>
-                    </StackPanel>
+                    <Viewbox Stretch="Uniform" MinHeight="297">
+                        <Image x:Name="albumArt" VerticalAlignment="Bottom"/>
+                    </Viewbox>
                 </Grid>
                 <Rectangle x:Name="placeholder" VerticalAlignment="Center" HorizontalAlignment="Center" Width="125" Height="150" Margin="0,0,20,0"
                            Fill="{DynamicResource AccentColorBrush}">
@@ -185,11 +183,15 @@
                 </Rectangle>
             </Grid>
 
-            <Grid VerticalAlignment="Bottom" Height="30" Grid.Row="1">
+            <Grid VerticalAlignment="Bottom" Height="60" Grid.Row="1">
                 <Grid.Background>
                     <SolidColorBrush Color="Gray" Opacity="0.7" />
                 </Grid.Background>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel x:Name="topAlbumInfo" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0">
+                    <TextBlock FontSize="14" x:Name="nowPlayingAlbum" Margin="10,0,0,0" >Album</TextBlock>
+                    <TextBlock FontSize="14" x:Name="nowPlayingTrack" Margin="5,0,0,0" Opacity="0.5">Track</TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,0,0,10">
                     <Rectangle x:Name="repeat" Width="20" Height="15" Margin="20,-2,0,0" ToolTip="Loop"
                                MouseDown="Repeat_OnClick">
                         <Rectangle.OpacityMask>
@@ -240,7 +242,7 @@
                         </Rectangle.Style>
                     </Rectangle>
                 </StackPanel>
-                <Grid Width="Auto" Margin="130,0,0,0">
+                <Grid Width="Auto" Margin="130,0,0,12" VerticalAlignment="Bottom">
                     <Slider x:Name="volumeSlider" IsMoveToPointEnabled="True"
                             ValueChanged="VolumeSlider_OnValueChanged" Style="{DynamicResource FlatSlider}" Value="0.7"
                             Margin="0,0,10,0" Width="Auto" Foreground="#CCFFFFFF" Maximum="1" LargeChange="0.1"
