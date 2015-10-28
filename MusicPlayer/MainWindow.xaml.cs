@@ -8,7 +8,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using Dewritwo.Resources;
 using File = TagLib.File;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using MouseKeyboardActivityMonitor;
@@ -278,6 +277,10 @@ namespace MusicPlayer
                 artistSortingIcon.Fill = Brushes.LightGray;
                 artistSortingLabel.Foreground = Brushes.LightGray;
 
+                artistsSelector.Visibility = Visibility.Hidden;
+                albumsSelector.Visibility = Visibility.Hidden;
+                songsSelector.Visibility = Visibility.Visible;
+
                 songDataGrid.Visibility = Visibility.Visible;
                 scrollViewer.Visibility = Visibility.Hidden;
             }
@@ -301,6 +304,10 @@ namespace MusicPlayer
                 artistSortingIcon.Fill = Brushes.LightGray;
                 artistSortingLabel.Foreground = Brushes.LightGray;
 
+                artistsSelector.Visibility = Visibility.Hidden;
+                albumsSelector.Visibility = Visibility.Visible;
+                songsSelector.Visibility = Visibility.Hidden;
+
                 songDataGrid.Visibility = Visibility.Hidden;
                 scrollViewer.Visibility = Visibility.Visible;
             }
@@ -309,12 +316,12 @@ namespace MusicPlayer
         private void ArtistSorting_OnClick(object sender, RoutedEventArgs e)
         {
             Console.WriteLine("Not implemented");
-            /*
             if (artistSorting.Background != Brushes.LightGray)
             {
                 Sort("Artist");
+                GrabArtists();
 
-                artistSorting.Background = Brushes.LightGray;
+                //albumSorting.Background = Brushes.LightGray;
                 artistSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
                 artistSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
 
@@ -324,20 +331,14 @@ namespace MusicPlayer
                 albumSorting.ClearValue(BackgroundProperty);
                 albumSortingIcon.Fill = Brushes.LightGray;
                 albumSortingLabel.Foreground = Brushes.LightGray;
+
+                artistsSelector.Visibility = Visibility.Visible;
+                albumsSelector.Visibility = Visibility.Hidden;
+                songsSelector.Visibility = Visibility.Hidden;
+
+                songDataGrid.Visibility = Visibility.Hidden;
+                scrollViewer.Visibility = Visibility.Visible;
             }
-            else
-            {
-                albumSorting.ClearValue(BackgroundProperty);
-                albumSortingIcon.Fill = Brushes.LightGray;
-                albumSortingLabel.Foreground = Brushes.LightGray;
-                songSorting.ClearValue(BackgroundProperty);
-                songSortingIcon.Fill = Brushes.LightGray;
-                songSortingLabel.Foreground = Brushes.LightGray;
-                artistSorting.ClearValue(BackgroundProperty);
-                artistSortingIcon.Fill = Brushes.LightGray;
-                artistSortingLabel.Foreground = Brushes.LightGray;
-            }
-            */
         }
 
         private void Sort(string col)
@@ -376,7 +377,7 @@ namespace MusicPlayer
 
         private void GrabAlbums()
         {
-            albumWrapPanel.Children.Clear();
+            wrapPanel.Children.Clear();
             var song = Itemsource.info;
             var noduplicates = song.GroupBy(x => x.Album).Select(x => x.First()).ToList();
 
@@ -386,10 +387,6 @@ namespace MusicPlayer
             {
                 var tagFile = File.Create(item.FileName);
 
-                
-           
-                
-
                 Tile newTile = new Tile();
                 
                 newTile.VerticalContentAlignment = VerticalAlignment.Bottom;
@@ -397,7 +394,7 @@ namespace MusicPlayer
                 newTile.Height = 175;
                 newTile.Margin = new Thickness(5);
                 newTile.FontSize = 14;
-                newTile.Content = item.Album;
+                newTile.Title = item.Album;
                 newTile.Foreground = Brushes.Transparent;
                 //newTile.Foreground = (Brush)FindResource("AccentColorBrush");
                 newTile.Click += new RoutedEventHandler(Album_OnClick);
@@ -420,11 +417,52 @@ namespace MusicPlayer
                 catch
                 {
                     newTile.Foreground = Brushes.White;
-                    newTile.Background = (Brush)FindResource("GrayBrush2");
+                    newTile.Background = (Brush)FindResource("AccentColorBrush2");
                 }
 
-                albumWrapPanel.Children.Add(newTile);
+                wrapPanel.Children.Add(newTile);
                 Console.WriteLine(item.Album);
+            }
+        }
+
+        private void GrabArtists()
+        {
+            bool isGray = false;
+            wrapPanel.Children.Clear();
+            var song = Itemsource.info;
+            var noduplicates = song.GroupBy(x => x.Artist).Select(x => x.First()).ToList();
+
+            song.GroupBy(x => x.Artist).Select(x => x.First()).Distinct();
+
+            
+
+            foreach (var item in noduplicates)
+            {
+                Tile newTile = new Tile();
+
+                newTile.Width = 600;
+                newTile.Height = 50;
+                newTile.Margin = new Thickness(5);
+                newTile.FontSize = 14;
+                newTile.Title = item.Artist;
+                newTile.Foreground = Brushes.Transparent;
+                //newTile.Foreground = (Brush)FindResource("AccentColorBrush");
+                newTile.Click += new RoutedEventHandler(Artist_OnClick);
+
+                newTile.Foreground = Brushes.White;
+                if (!isGray)
+                {
+                    newTile.Background = (Brush)FindResource("AccentColorBrush2");
+                    isGray = true;
+                }
+                else
+                {
+                    newTile.Background = (Brush)FindResource("AccentColorBrush3");
+                    isGray = false;
+                }
+
+                wrapPanel.Children.Add(newTile);
+                Console.WriteLine(item.Artist);
             }
         }
 
@@ -432,37 +470,83 @@ namespace MusicPlayer
         {
             List<Itemsource.Songs> album = Itemsource.info.ToList();
 
-            string content = (sender as Button).Content.ToString();
+            string content = (sender as Tile).Title;
             album = album.Where(x => x.Album == content).ToList();
             songDataGrid.ItemsSource = album;
 
-            songDataGrid.SelectedIndex = 0;
-            var selectedSong = songDataGrid.SelectedItem as Itemsource.Songs;
-            var tagFile = File.Create(selectedSong.FileName);
-
-            try
+            if (!mplayer.HasAudio)
             {
-                var pic = tagFile.Tag.Pictures[0];
-                var ms = new MemoryStream(pic.Data.Data);
-                ms.Seek(0, SeekOrigin.Begin);
+                songDataGrid.SelectedIndex = 0;
+                var selectedSong = songDataGrid.SelectedItem as Itemsource.Songs;
+                var tagFile = File.Create(selectedSong.FileName);
 
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.StreamSource = ms;
-                bitmap.EndInit();
+                try
+                {
+                    var pic = tagFile.Tag.Pictures[0];
+                    var ms = new MemoryStream(pic.Data.Data);
+                    ms.Seek(0, SeekOrigin.Begin);
 
-                var img = new Image();
-                img.Source = bitmap;
-                albumArt.Source = img.Source;
-                placeholder.Visibility = Visibility.Hidden;
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = ms;
+                    bitmap.EndInit();
+
+                    var img = new Image();
+                    img.Source = bitmap;
+                    albumArt.Source = img.Source;
+                    placeholder.Visibility = Visibility.Hidden;
+                }
+                catch
+                {
+                    placeholder.Visibility = Visibility.Visible;
+                }
+                nowPlayingAlbum.Text = content;
+                nowPlayingTrack.Text = selectedSong.Track;
+                nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
             }
-            catch
-            {
-                placeholder.Visibility = Visibility.Visible;
+            scrollViewer.Visibility = Visibility.Hidden;
+            songDataGrid.Visibility = Visibility.Visible;
+        }
+
+        private void Artist_OnClick(object sender, RoutedEventArgs e)
+        {
+            List<Itemsource.Songs> artist = Itemsource.info.ToList();
+
+            string content = (sender as Tile).Title;
+            artist = artist.Where(x => x.Artist == content).ToList();
+            songDataGrid.ItemsSource = artist;
+
+            if (!mplayer.HasAudio)
+            { 
+                songDataGrid.SelectedIndex = 0;
+                var selectedSong = songDataGrid.SelectedItem as Itemsource.Songs;
+                var tagFile = File.Create(selectedSong.FileName);
+
+                try
+                {
+                    var pic = tagFile.Tag.Pictures[0];
+                    var ms = new MemoryStream(pic.Data.Data);
+                    ms.Seek(0, SeekOrigin.Begin);
+
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = ms;
+                    bitmap.EndInit();
+
+                    var img = new Image();
+                    img.Source = bitmap;
+                    albumArt.Source = img.Source;
+                    placeholder.Visibility = Visibility.Hidden;
+                }
+                catch
+                {
+                    placeholder.Visibility = Visibility.Visible;
+                }
+                nowPlayingAlbum.Text = content;
+                nowPlayingTrack.Text = selectedSong.Track;
+                nowPlayingSong.Content = selectedSong.Name + " - " + selectedSong.Artist;
             }
-
-            nowPlayingAlbum.Text = content;
-
+            
             scrollViewer.Visibility = Visibility.Hidden;
             songDataGrid.Visibility = Visibility.Visible;
         }

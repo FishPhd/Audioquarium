@@ -3,7 +3,7 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:local="clr-namespace:MusicPlayer"
-                      Title="Music" Height="548" MinHeight="80" MinWidth="180" Width="900" >
+                      Title="Music" Height="549" MinHeight="80" MinWidth="180" Width="900" >
     <Controls:MetroWindow.Resources>
         <ObjectDataProvider x:Key="Color" ObjectType="{x:Type local:Dictionaries}" MethodName="GetColor" />
     </Controls:MetroWindow.Resources>
@@ -88,8 +88,9 @@
                             </Style>
                         </Button.Style>
                         <Button.Content>
-                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0" >
-                                <Rectangle x:Name="albumSortingIcon" Width="30" Height="40" Margin="0,0,0,0"
+                            <StackPanel Orientation="Horizontal" Margin="5,0,0,0" >
+                                <Grid Visibility="Hidden" x:Name="albumsSelector" Opacity="0.7" Width="3" Margin="5,0,0,0" Height="35" Background="{DynamicResource AccentColorBrush}"></Grid>
+                                <Rectangle x:Name="albumSortingIcon" Width="25" Height="35" Margin="13,0,0,0"
                                         Fill="{DynamicResource GrayBrush6}">
                                     <Rectangle.OpacityMask>
                                         <VisualBrush Visual="{StaticResource Music}" />
@@ -122,8 +123,9 @@
                             </Style>
                         </Button.Style>
                         <Button.Content>
-                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-                                <Rectangle x:Name="artistSortingIcon"  Width="30" Height="30" Margin="0,0,0,0"
+                            <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
+                                <Grid Visibility="Hidden" x:Name="artistsSelector" Width="3" Opacity="0.7" Margin="5,0,0,0" Height="35" Background="{DynamicResource AccentColorBrush}"></Grid>
+                                <Rectangle x:Name="artistSortingIcon"  Width="30" Height="30" Margin="10,0,0,0"
                                         Fill="{DynamicResource GrayBrush6}">
                                     <Rectangle.OpacityMask>
                                         <VisualBrush Visual="{StaticResource Modern_Mic}" />
@@ -156,14 +158,15 @@
                             </Style>
                         </Button.Style>
                         <Button.Content>
-                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-                                <Rectangle  x:Name="songSortingIcon" Width="30" Height="35" Margin="0,0,0,0"
+                            <StackPanel Orientation="Horizontal" Height="50" Margin="5,0,0,0">
+                                <Grid x:Name="songsSelector" Width="3" Margin="5,0,0,0" Height="35" Opacity="0.7"  Background="{DynamicResource AccentColorBrush}"></Grid>
+                                <Rectangle  x:Name="songSortingIcon" Width="25" Height="30" Margin="10,0,0,0"
                                         Fill="{DynamicResource AccentColorBrush}">
                                     <Rectangle.OpacityMask>
                                         <VisualBrush Visual="{StaticResource appbar_music}" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
-                                <Label x:Name="songSortingLabel" Foreground="{DynamicResource AccentColorBrush}" Margin="5,0,0,0" FontSize="14">Songs</Label>
+                                <Label x:Name="songSortingLabel" VerticalAlignment="Center" Foreground="{DynamicResource AccentColorBrush}" Margin="5,0,0,0" FontSize="14">Songs</Label>
                             </StackPanel>
                         </Button.Content>
                     </Button>
@@ -327,7 +330,7 @@
                 </DataGrid.Columns>
             </DataGrid>
             <ScrollViewer x:Name="scrollViewer" Visibility="Hidden" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                <WrapPanel x:Name="albumWrapPanel" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <WrapPanel x:Name="wrapPanel" Margin="10,10,10,0">
                 </WrapPanel>
             </ScrollViewer>
         </Grid>

@@ -6,15 +6,11 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 
-namespace Dewritwo.Resources
+namespace MusicPlayer
 {
     internal class Cfg
     {
-        #region Variables
-
         public static Dictionary<string, string> configFile;
-
-        #endregion
 
         #region cfg Loading and Saving
 
@@ -24,11 +20,6 @@ namespace Dewritwo.Resources
                 configDict[varName] = varValue;
             else
                 configDict.Add(varName, varValue);
-        }
-
-        private static bool CheckIfProcessIsRunning(string nameSubstring)
-        {
-            return Process.GetProcesses().Any(p => p.ProcessName.Contains(nameSubstring));
         }
 
         public static bool SaveConfigFile(string CfgFileName, Dictionary<string, string> configDict)
@@ -43,45 +34,12 @@ namespace Dewritwo.Resources
                     lines.Add(kvp.Key + " \"" + kvp.Value + "\"");
 
                 File.WriteAllLines(CfgFileName, lines.ToArray());
-
-
-                var running = CheckIfProcessIsRunning("eldorado");
-                if (running)
-                {
-                    dewCmd("Execute dewrito_prefs.cfg");
-                }
                 return true;
             }
             catch
             {
                 return false;
             }
-        }
-
-        public static string dewCmd(string cmd)
-        {
-            var data = new byte[1024];
-            string stringData;
-            TcpClient server;
-            try
-            {
-                server = new TcpClient("127.0.0.1", 2448);
-            }
-            catch (SocketException)
-            {
-                return "Is Eldorito Running?";
-            }
-            var ns = server.GetStream();
-
-            var recv = ns.Read(data, 0, data.Length);
-            stringData = Encoding.ASCII.GetString(data, 0, recv);
-
-            ns.Write(Encoding.ASCII.GetBytes(cmd), 0, cmd.Length);
-            ns.Flush();
-
-            ns.Close();
-            server.Close();
-            return "Done";
         }
 
         private static bool LoadConfigFile(string CfgFileName, ref Dictionary<string, string> returnDict)
