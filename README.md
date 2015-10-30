@@ -12,12 +12,12 @@ Please report all bugs under issues on this repo. I do check them!
 
 ### To:Do
 * Metdata Editor (All the works)
-* More robust sorting and grid layout (album and artist sorting will be done soon)
+* More robust sorting / Search feature within grid layout
 * Full screen mode and minimized mode (You can already kinda do this with the resizable window)
-* Search feature within grid layout
 
 ### Done:
 * Themes
+* * Album and artist sorting
 * Repeat button Once/Loop
 
 ### Maybe:
