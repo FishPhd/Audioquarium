@@ -2,7 +2,7 @@
 
 ## Super Lightweight Audio Player, No BS
 
-![alt tag](http://i.imgur.com/P6W56QJ.jpg)
+![alt tag](http://i.imgur.com/xk0BGK9.jpg)
 
 Hit the settings icon to add your music directory, everything else should be common sense.
 
