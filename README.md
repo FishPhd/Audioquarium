@@ -1,8 +1,8 @@
-# FishPlayer
+# Audioquarium
 
 ## Super Lightweight Audio Player, No BS
 
-![alt tag](http://i.imgur.com/ZTMuZap.png)
+![alt tag](http://i.imgur.com/P6W56QJ.jpg)
 
 Hit the settings icon to add your music directory, everything else should be common sense.
 
@@ -17,7 +17,7 @@ Please report all bugs under issues on this repo. I do check them!
 
 ### Done:
 * Themes
-* * Album and artist sorting
+* Album and artist sorting
 * Repeat button Once/Loop
 
 ### Maybe:
