@@ -33,7 +33,7 @@
                       controls:ButtonHelper.PreserveTextCase="True" Height="30" Width="70"
                       Click="btnChange_OnClick" Margin="15,0,10,0" Content="Change"
                       BorderBrush="{x:Null}" />
-              <Button Style="{StaticResource AccentedSquareButtonStyle}" x:Name="clear1"
+              <Button Style="{StaticResource AccentedSquareButtonStyle}" x:Name="Clear1"
                       controls:ButtonHelper.PreserveTextCase="True" Height="30" Width="70"
                       Click="btnClear1_OnClick" Margin="0,0,10,0" Content="Clear"
                       BorderBrush="{x:Null}" />

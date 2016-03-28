@@ -1,7 +1,6 @@
-﻿<Application x:Class="MusicPlayer.App"
+﻿<Application x:Class="Audioquarium.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:MusicPlayer"
              StartupUri="MainWindow.xaml">
   <Application.Resources>
     <ResourceDictionary>

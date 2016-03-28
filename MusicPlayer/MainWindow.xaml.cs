@@ -32,7 +32,7 @@ namespace Audioquarium
     private bool _shuffleSongs;
     private bool _repeatSong;
     private string _currentSong;
-    private int _currentView = 0; // Song(0) Album(1) Artist(2) 
+    private int _currentView; // Song(0) Album(1) Artist(2) 
 
     public MainWindow()
     {
