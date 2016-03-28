@@ -18,71 +18,94 @@ namespace Audioquarium
       watch.Start();
 
       Info?.Clear();
-      var d = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories)
-        .Where(s => s.EndsWith(".mp3") || s.EndsWith(".wav") || s.EndsWith(".aac") 
-        || s.EndsWith(".flac") || s.EndsWith(".wma"));
+      var filetypes = new[] { "mp3", "wav", "aac", "flac", "wma"};
 
-      foreach (var file in d)
+      /*
+      var d = Directory.EnumerateFileSystemEntries(path, "*.*", SearchOption.AllDirectories)
+        .Where(s => s.EndsWith(".mp3") || s.EndsWith(".wav") || s.EndsWith(".aac") 
+        || s.EndsWith(".flac") || s.EndsWith(".wma")).ToList();
+        */
+
+      foreach (var file in FilterFiles(path, filetypes))
       {
         var tagFile = File.Create(file);
 
-        if (tagFile.Tag.Title == null)
+        try
+        {
+          if (tagFile.Tag.Title == null)
+          {
+            Info?.Add(new Songs
+            {
+              Name = Path.GetFileNameWithoutExtension(file),
+              Artist = tagFile.Tag.FirstAlbumArtist,
+              Album = tagFile.Tag.Album,
+              Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
+              Track = tagFile.Tag.Track.ToString(),
+              FileName = tagFile.Name,
+              AltName = Path.GetFileNameWithoutExtension(file)
+            });
+          }
+          else if (tagFile.Tag.FirstAlbumArtist == null)
+          {
+            Info?.Add(new Songs
+            {
+              Name = Path.GetFileNameWithoutExtension(file),
+              Artist = tagFile.Tag.Performers[0],
+              Album = tagFile.Tag.Album,
+              Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
+              Track = tagFile.Tag.Track.ToString(),
+              FileName = tagFile.Name,
+              AltName = Path.GetFileNameWithoutExtension(file)
+            });
+          }
+          else if (tagFile.Tag.FirstAlbumArtist == null && tagFile.Tag.Title == null)
+          {
+            Info?.Add(new Songs
+            {
+              Name = Path.GetFileNameWithoutExtension(file),
+              Artist = tagFile.Tag.Performers[0],
+              Album = tagFile.Tag.Album,
+              Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
+              Track = tagFile.Tag.Track.ToString(),
+              FileName = tagFile.Name,
+              AltName = Path.GetFileNameWithoutExtension(file)
+            });
+          }
+          else
+          {
+            Info?.Add(new Songs
+            {
+              Name = tagFile.Tag.Title,
+              Artist = tagFile.Tag.FirstAlbumArtist,
+              Album = tagFile.Tag.Album,
+              Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
+              Track = tagFile.Tag.Track.ToString(),
+              FileName = tagFile.Name,
+              AltName = Path.GetFileNameWithoutExtension(file)
+            });
+          }
+        }
+        catch
         {
           Info?.Add(new Songs
           {
             Name = Path.GetFileNameWithoutExtension(file),
-            Artist = tagFile.Tag.FirstAlbumArtist,
-            Album = tagFile.Tag.Album,
-            Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
-            Track = tagFile.Tag.Track.ToString(),
-            FileName = tagFile.Name,
-            AltName = Path.GetFileNameWithoutExtension(file)
-          });
-        }
-        else if (tagFile.Tag.FirstAlbumArtist == null)
-        {
-          Info?.Add(new Songs
-          {
-            Name = Path.GetFileNameWithoutExtension(file),
-            Artist = tagFile.Tag.Performers[0],
-            Album = tagFile.Tag.Album,
-            Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
-            Track = tagFile.Tag.Track.ToString(),
-            FileName = tagFile.Name,
-            AltName = Path.GetFileNameWithoutExtension(file)
-          });
-        }
-        else if (tagFile.Tag.FirstAlbumArtist == null && tagFile.Tag.Title == null)
-        {
-          Info?.Add(new Songs
-          {
-            Name = Path.GetFileNameWithoutExtension(file),
-            Artist = tagFile.Tag.Performers[0],
-            Album = tagFile.Tag.Album,
-            Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
-            Track = tagFile.Tag.Track.ToString(),
-            FileName = tagFile.Name,
-            AltName = Path.GetFileNameWithoutExtension(file)
-          });
-        }
-        else
-        {
-          Info?.Add(new Songs
-          {
-            Name = tagFile.Tag.Title,
-            Artist = tagFile.Tag.FirstAlbumArtist,
-            Album = tagFile.Tag.Album,
-            Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
-            Track = tagFile.Tag.Track.ToString(),
-            FileName = tagFile.Name,
             AltName = Path.GetFileNameWithoutExtension(file)
           });
         }
       }
 
-
       watch.Stop();
       Console.WriteLine(@"Songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
+    }
+
+    public static IEnumerable<string> FilterFiles(string path, params string[] exts)
+    {
+      return
+          exts.Select(x => "*." + x) // turn into globs
+          .SelectMany(x =>
+              Directory.EnumerateFiles(path, x, SearchOption.AllDirectories)
+              );
     }
 
     public class Songs

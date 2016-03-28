@@ -135,8 +135,6 @@ namespace Audioquarium
 
       if (SongDataGrid.ItemsSource != null && selectedSong != null) //&& selectedSong.FileName != _currentSong
       {
-        Mplayer.Close();
-
         Mplayer.Open(new Uri(selectedSong.FileName));
         //Console.WriteLine(selectedSong.FileName);
         Mplayer.Play();
