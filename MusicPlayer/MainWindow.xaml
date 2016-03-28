@@ -3,7 +3,7 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:local="clr-namespace:Audioquarium"
-                      Title="Music" Height="549" MinHeight="80" MinWidth="180" Width="900">
+                      Title="Audioquarium" Height="549" MinHeight="80" MinWidth="180" Width="900">
   <controls:MetroWindow.Resources>
     <ObjectDataProvider x:Key="Color" ObjectType="{x:Type local:Dictionaries}" MethodName="GetColor" />
   </controls:MetroWindow.Resources>
@@ -331,23 +331,23 @@
                   Foreground="{DynamicResource AccentColorBrush}" Width="Auto" Height="10.3"
                   TickFrequency="0.5" />
         </StackPanel>
-        <Label HorizontalAlignment="Right" x:Name="scrubTime" Margin="0,0,0,26">00:00 / 00:00</Label>
+        <Label HorizontalAlignment="Right" x:Name="ScrubTime" Margin="0,0,0,26">00:00 / 00:00</Label>
       </Grid>
     </Grid>
-    <Grid Grid.Column="1" Grid.Row="0" x:Name="SongsGrid">
+    <Grid Grid.Column="1" Grid.Row="0">
       <DataGrid x:Name="SongDataGrid" CanUserResizeColumns="True" CanUserReorderColumns="False"
                 CanUserResizeRows="False" MouseLeftButtonDown="SongGrid_OnLeftButtonDown"
                 IsReadOnly="True" AutoGenerateColumns="False" Padding="0,0,10,0" HeadersVisibility="None"
-                Style="{StaticResource AzureDataGrid}">
-        <DataGrid.Columns>
-          <DataGridTextColumn MinWidth="120" Width="150" Header="Song" Binding="{Binding Name}" />
-          <DataGridTextColumn MinWidth="100" Width="150" Header="Artist" Binding="{Binding Artist}" />
-          <DataGridTextColumn Width="150" Header="Album" Binding="{Binding Album}" />
-          <DataGridTextColumn Width="60" Header="Track" Binding="{Binding Track}" />
-          <DataGridTextColumn Width="*" Header="Length" Binding="{Binding Length}" />
-        </DataGrid.Columns>
-      </DataGrid>
-      <ScrollViewer x:Name="ScrollViewer" Visibility="Hidden" HorizontalScrollBarVisibility="Disabled"
+                Style="{StaticResource AzureDataGrid}" VerticalAlignment="Top">
+          <DataGrid.Columns>
+            <DataGridTextColumn MinWidth="120" Width="150" Header="Song" Binding="{Binding Name}" />
+            <DataGridTextColumn MinWidth="100" Width="150" Header="Artist" Binding="{Binding Artist}" />
+            <DataGridTextColumn Width="150" Header="Album" Binding="{Binding Album}" />
+            <DataGridTextColumn Width="60" Header="Track" Binding="{Binding Track}" />
+            <DataGridTextColumn Width="*" Header="Length" Binding="{Binding Length}" />
+          </DataGrid.Columns>
+        </DataGrid>
+        <ScrollViewer x:Name="ScrollViewer" Visibility="Hidden" HorizontalScrollBarVisibility="Disabled"
                     VerticalScrollBarVisibility="Auto">
         <WrapPanel x:Name="WrapPanel" Margin="10,10,10,0" />
       </ScrollViewer>

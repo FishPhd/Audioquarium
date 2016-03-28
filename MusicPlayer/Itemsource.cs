@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using File = TagLib.File;
 
 namespace Audioquarium
@@ -11,9 +14,13 @@ namespace Audioquarium
 
     public static void LoadSongs(string path)
     {
-      Info.Clear();
+      Stopwatch watch = new Stopwatch();
+      watch.Start();
+
+      Info?.Clear();
       var d = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories)
-        .Where(s => s.EndsWith(".mp3") || s.EndsWith(".wav") || s.EndsWith(".aac") || s.EndsWith(".flac"));
+        .Where(s => s.EndsWith(".mp3") || s.EndsWith(".wav") || s.EndsWith(".aac") 
+        || s.EndsWith(".flac") || s.EndsWith(".wma"));
 
       foreach (var file in d)
       {
@@ -21,7 +28,7 @@ namespace Audioquarium
 
         if (tagFile.Tag.Title == null)
         {
-          Info.Add(new Songs
+          Info?.Add(new Songs
           {
             Name = Path.GetFileNameWithoutExtension(file),
             Artist = tagFile.Tag.FirstAlbumArtist,
@@ -34,7 +41,7 @@ namespace Audioquarium
         }
         else if (tagFile.Tag.FirstAlbumArtist == null)
         {
-          Info.Add(new Songs
+          Info?.Add(new Songs
           {
             Name = Path.GetFileNameWithoutExtension(file),
             Artist = tagFile.Tag.Performers[0],
@@ -47,7 +54,7 @@ namespace Audioquarium
         }
         else if (tagFile.Tag.FirstAlbumArtist == null && tagFile.Tag.Title == null)
         {
-          Info.Add(new Songs
+          Info?.Add(new Songs
           {
             Name = Path.GetFileNameWithoutExtension(file),
             Artist = tagFile.Tag.Performers[0],
@@ -60,7 +67,7 @@ namespace Audioquarium
         }
         else
         {
-          Info.Add(new Songs
+          Info?.Add(new Songs
           {
             Name = tagFile.Tag.Title,
             Artist = tagFile.Tag.FirstAlbumArtist,
@@ -72,6 +79,10 @@ namespace Audioquarium
           });
         }
       }
+
+
+      watch.Stop();
+      Console.WriteLine(@"Songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
     }
 
     public class Songs

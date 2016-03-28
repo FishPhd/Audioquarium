@@ -37,7 +37,6 @@ namespace Audioquarium
 
     private static bool LoadConfigFile(string cfgFileName, ref Dictionary<string, string> returnDict)
     {
-      if (returnDict == null) throw new ArgumentNullException(nameof(returnDict));
       returnDict = new Dictionary<string, string>();
       if (!File.Exists(cfgFileName))
         return false;
