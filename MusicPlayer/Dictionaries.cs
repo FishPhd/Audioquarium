@@ -1,40 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace MusicPlayer
+namespace Audioquarium
 {
-    class Dictionaries
+  class Dictionaries
+  {
+    public static Dictionary<string, string> GetColor()
     {
-        public static Dictionary<string, string> GetColor()
-        {
-            var colors = new Dictionary<string, string>();
-            colors.Add("Blue", "blue");
-            colors.Add("Red", "red");
-            colors.Add("Green", "green");
-            colors.Add("Purple", "purple");
-            colors.Add("Orange", "orange");
-            colors.Add("Lime", "lime");
-            colors.Add("Emerald", "emerald");
-            colors.Add("Teal", "teal");
-            colors.Add("Cyan", "cyan");
-            colors.Add("Cobalt", "cobalt");
-            colors.Add("Indigo", "indigo");
-            colors.Add("Violet", "violet");
-            colors.Add("Pink", "pink");
-            colors.Add("Magenta", "magenta");
-            colors.Add("Crimson", "crimson");
-            colors.Add("Amber", "amber");
-            colors.Add("Yellow", "yellow");
-            colors.Add("Brown", "brown");
-            colors.Add("Olive", "olive");
-            colors.Add("Steel", "steel");
-            colors.Add("Mauve", "mauve");
-            colors.Add("Taupe", "taupe");
-            colors.Add("Sienna", "sienna");
-            return colors;
-        }
+      var colors = new Dictionary<string, string>
+      {
+        {"Blue", "blue"},
+        {"Red", "red"},
+        {"Green", "green"},
+        {"Purple", "purple"},
+        {"Orange", "orange"},
+        {"Lime", "lime"},
+        {"Emerald", "emerald"},
+        {"Teal", "teal"},
+        {"Cyan", "cyan"},
+        {"Cobalt", "cobalt"},
+        {"Indigo", "indigo"},
+        {"Violet", "violet"},
+        {"Pink", "pink"},
+        {"Magenta", "magenta"},
+        {"Crimson", "crimson"},
+        {"Amber", "amber"},
+        {"Yellow", "yellow"},
+        {"Brown", "brown"},
+        {"Olive", "olive"},
+        {"Steel", "steel"},
+        {"Mauve", "mauve"},
+        {"Taupe", "taupe"},
+        {"Sienna", "sienna"}
+      };
+      return colors;
     }
+  }
 }
