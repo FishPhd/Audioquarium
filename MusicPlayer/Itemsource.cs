@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using File = TagLib.File;
 
 namespace Audioquarium
@@ -81,21 +80,6 @@ namespace Audioquarium
             });
           }
       }
-
-      /*
-      catch (UnauthorizedAccessException UAEx)
-        {
-          Console.WriteLine(UAEx.Message);
-        }
-        catch (PathTooLongException PathEx)
-        {
-          Console.WriteLine(PathEx.Message);
-        }
-        catch
-        {
-          Console.WriteLine(@"You really fucked up now");
-        }
-        */
 
       watch.Stop();
       Console.WriteLine (@"Songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -274,6 +277,7 @@ namespace Audioquarium
         Cfg.SetVariable("Music." + objname, Convert.ToString(dialog.FileName), ref Cfg.ConfigFile);
         Cfg.SaveConfigFile("music_prefs.cfg", Cfg.ConfigFile);
         Directory1Text.Text = Cfg.ConfigFile["Music.Directory1"];
+        Load();
       }
     }
 
@@ -304,13 +308,14 @@ namespace Audioquarium
       }
     }
 
-    private void AlbumSorting_OnClick(object sender, RoutedEventArgs e)
+    private void  AlbumSorting_OnClick(object sender, RoutedEventArgs e)
     {
       if (!Equals(AlbumSorting.Background, Brushes.LightGray))
       {
+        GrabAlbums();
+
         _currentView = 1; // Set our view to album grid
         Sort("Album", SongDataGrid);
-        GrabAlbums();
 
         //albumSorting.Background = Brushes.LightGray;
         AlbumSortingIcon.Fill = (Brush) FindResource("AccentColorBrush");
@@ -400,6 +405,9 @@ namespace Audioquarium
 
     private void GrabAlbums()
     {
+      Stopwatch watch = new Stopwatch();
+      watch.Start();
+
       WrapPanel.Children.Clear();
       var song = Itemsource.Info;
       var noduplicates = song.GroupBy(x => x.Album).Select(x => x.First()).ToList();
@@ -443,8 +451,9 @@ namespace Audioquarium
         }
 
         WrapPanel.Children.Add(newTile);
-        //Console.WriteLine(item.Album);
       }
+      watch.Stop();
+      Console.WriteLine(@"Album art loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
     }
 
     private void GrabArtists()
