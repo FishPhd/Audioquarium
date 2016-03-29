@@ -27,7 +27,8 @@
           <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0" VerticalAlignment="Top" Height="30">
               <Label>Music Directory:</Label>
-              <TextBox x:Name="Directory1Text" IsReadOnly="True" controls:TextBoxHelper.Watermark="None" Margin="10,0,0,0"
+              <TextBox x:Name="Directory1Text" IsReadOnly="True" controls:TextBoxHelper.Watermark="None"
+                       Margin="10,0,0,0"
                        Height="20" Width="200" TextChanged="Directory1_OnTextChanged" />
               <Button Style="{StaticResource AccentedSquareButtonStyle}" x:Name="Directory1"
                       controls:ButtonHelper.PreserveTextCase="True" Height="30" Width="70"
@@ -339,15 +340,15 @@
                 CanUserResizeRows="False" MouseLeftButtonDown="SongGrid_OnLeftButtonDown"
                 IsReadOnly="True" AutoGenerateColumns="False" Padding="0,0,10,0" HeadersVisibility="None"
                 Style="{StaticResource AzureDataGrid}" VerticalAlignment="Top">
-          <DataGrid.Columns>
-            <DataGridTextColumn MinWidth="120" Width="150" Header="Song" Binding="{Binding Name}" />
-            <DataGridTextColumn MinWidth="100" Width="150" Header="Artist" Binding="{Binding Artist}" />
-            <DataGridTextColumn Width="150" Header="Album" Binding="{Binding Album}" />
-            <DataGridTextColumn Width="60" Header="Track" Binding="{Binding Track}" />
-            <DataGridTextColumn Width="*" Header="Length" Binding="{Binding Length}" />
-          </DataGrid.Columns>
-        </DataGrid>
-        <ScrollViewer x:Name="ScrollViewer" Visibility="Hidden" HorizontalScrollBarVisibility="Disabled"
+        <DataGrid.Columns>
+          <DataGridTextColumn MinWidth="120" Width="150" Header="Song" Binding="{Binding Name}" />
+          <DataGridTextColumn MinWidth="100" Width="150" Header="Artist" Binding="{Binding Artist}" />
+          <DataGridTextColumn Width="150" Header="Album" Binding="{Binding Album}" />
+          <DataGridTextColumn Width="60" Header="Track" Binding="{Binding Track}" />
+          <DataGridTextColumn Width="*" Header="Length" Binding="{Binding Length}" />
+        </DataGrid.Columns>
+      </DataGrid>
+      <ScrollViewer x:Name="ScrollViewer" Visibility="Hidden" HorizontalScrollBarVisibility="Disabled"
                     VerticalScrollBarVisibility="Auto">
         <WrapPanel x:Name="WrapPanel" Margin="10,10,10,0" />
       </ScrollViewer>

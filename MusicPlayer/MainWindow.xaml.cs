@@ -221,18 +221,18 @@ namespace Audioquarium
 
       if (_currentView == 0)
       {
-        SongSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
-        SongSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
+        SongSortingIcon.Fill = (Brush) FindResource("AccentColorBrush");
+        SongSortingLabel.Foreground = (Brush) FindResource("AccentColorBrush");
       }
       if (_currentView == 1)
       {
-        AlbumSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
-        AlbumSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
+        AlbumSortingIcon.Fill = (Brush) FindResource("AccentColorBrush");
+        AlbumSortingLabel.Foreground = (Brush) FindResource("AccentColorBrush");
       }
       else if (_currentView == 2)
       {
-        ArtistSortingIcon.Fill = (Brush)FindResource("AccentColorBrush");
-        ArtistSortingLabel.Foreground = (Brush)FindResource("AccentColorBrush");
+        ArtistSortingIcon.Fill = (Brush) FindResource("AccentColorBrush");
+        ArtistSortingLabel.Foreground = (Brush) FindResource("AccentColorBrush");
       }
 
       Cfg.ConfigFile["Player.Color"] = Colors.SelectedValue.ToString();
