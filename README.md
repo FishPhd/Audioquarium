@@ -6,21 +6,8 @@
 
 Hit the settings icon to add your music directory, everything else should be common sense.
 
-Working filetypes: aac,wav,mp3,flac, probably others im too lazy to test
+Working filetypes: aac,wav,mp3,flac,wma
 
 Please report all bugs under issues on this repo. I do check them!
 
-### To:Do
-* Metdata Editor (All the works)
-* More robust sorting / Search feature within grid layout
-* Full screen mode and minimized mode (You can already kinda do this with the resizable window)
-
-### Done:
-* Themes
-* Album and artist sorting
-* Repeat button Once/Loop
-
-### Maybe:
-
-* Online metadata recieving (this usually causes more problems than answers)
-* Online Lyrics (much more useful)
+Project layout: http://project.audioquarium.net/
