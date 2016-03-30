@@ -25,7 +25,7 @@
           </Rectangle.OpacityMask>
         </Rectangle>
       </Button>
-      <Rectangle x:Name="PlayerSizeRect" Width="20" Height="20" Margin="10,0,0,0">
+      <Rectangle IsHitTestVisible="False" x:Name="PlayerSizeRect" Width="20" Height="20" Margin="10,0,0,0">
         <Rectangle.Fill>
           <VisualBrush Stretch="Uniform" Visual="{StaticResource appbar_shark}" />
         </Rectangle.Fill>
@@ -73,6 +73,12 @@
                         ItemsSource="{Binding Source={StaticResource Color}}" SelectedValuePath="Value"
                         DisplayMemberPath="Key" Height="15" />
             </StackPanel>
+            <TextBlock Margin="10,15,0,0">
+              <Hyperlink Foreground="Red" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="http://issues.audioquarium.net/">Report all bugs here!</Hyperlink>
+            </TextBlock>
+            <TextBlock Margin="10,10,0,0">
+              <Hyperlink Foreground="AliceBlue" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="http://download.audioquarium.net/">Keep up to date here!</Hyperlink>
+            </TextBlock>
           </StackPanel>
         </Grid>
       </controls:Flyout>

@@ -56,7 +56,6 @@ namespace Audioquarium
       if (Mplayer.Source != null && Mplayer.NaturalDuration.HasTimeSpan)
       {
         SongDataGrid.SelectedIndex = SongDataGrid.SelectedIndex;
-        //_selectedSong = SongDataGrid.SelectedItem as Itemsource.Songs;
 
         ScrubBar.Minimum = 0;
         ScrubBar.Maximum = Mplayer.NaturalDuration.TimeSpan.TotalSeconds;
@@ -71,6 +70,7 @@ namespace Audioquarium
         }
       }
 
+      // When the song ends
       if (Mplayer.Source != null && Mplayer.NaturalDuration.HasTimeSpan
           && Mplayer.Position.TotalSeconds == Mplayer.NaturalDuration.TimeSpan.TotalSeconds)
       {
@@ -80,8 +80,6 @@ namespace Audioquarium
           SongDataGrid.SelectedIndex = SongDataGrid.SelectedIndex;
         else if (_selectedSong == SongDataGrid.SelectedItem as Itemsource.Songs)
           Next(); // If the current song is the same as the one playing then go to next
-
-        _selectedSong = SongDataGrid.SelectedItem as Itemsource.Songs;
 
         if (_selectedSong != null)
         {
@@ -154,7 +152,6 @@ namespace Audioquarium
     private void GetAlbumart()
     {
       var tagFile = File.Create(_selectedSong.FileName);
-      // = SongDataGrid.SelectedItem as Itemsource.Songs;
       if (_selectedSong != null)
       {
         try
@@ -279,12 +276,17 @@ namespace Audioquarium
 
     private void SongSorting_OnClick(object sender, RoutedEventArgs e)
     {
-      if (!Equals(SongSorting.Background, Brushes.LightGray))
+      if (_currentView != 0)
       {
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
+
         _currentView = 0; // Set our view to songs grid
         SongDataGrid.ItemsSource = Itemsource.SongLibrary;
+
         //Sort("Name");
         //songSorting.Background = Brushes.LightGray;
+
         SongSortingIcon.Fill = (Brush) FindResource("AccentColorBrush");
         SongSortingLabel.Foreground = (Brush) FindResource("AccentColorBrush");
 
@@ -301,14 +303,18 @@ namespace Audioquarium
 
         SongDataGrid.Visibility = Visibility.Visible;
         ScrollViewer.Visibility = Visibility.Hidden;
+        watch.Stop();
+        Console.WriteLine(@"Songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
       }
     }
 
     private void AlbumSorting_OnClick(object sender, RoutedEventArgs e)
     {
-      if (!Equals(AlbumSorting.Background, Brushes.LightGray))
+      if (_currentView != 1)
       {
-        GrabAlbums();
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
+        int albumCount = GrabAlbums();
 
         Sort("Album", SongDataGrid);
         _currentView = 1; // Set our view to album grid
@@ -330,16 +336,20 @@ namespace Audioquarium
 
         SongDataGrid.Visibility = Visibility.Hidden;
         ScrollViewer.Visibility = Visibility.Visible;
+        watch.Stop();
+        Console.WriteLine(albumCount + @" albums and art loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
       }
     }
 
     private void ArtistSorting_OnClick(object sender, RoutedEventArgs e)
     {
-      if (!Equals(ArtistSorting.Background, Brushes.LightGray))
+      if (_currentView != 2)
       {
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
         _currentView = 2; // Set our view to artist grid
         Sort("Artist", SongDataGrid);
-        GrabArtists();
+        int artistcount = GrabArtists();
 
         //albumSorting.Background = Brushes.LightGray;
         ArtistSortingIcon.Fill = (Brush) FindResource("AccentColorBrush");
@@ -358,6 +368,8 @@ namespace Audioquarium
 
         SongDataGrid.Visibility = Visibility.Hidden;
         ScrollViewer.Visibility = Visibility.Visible;
+        watch.Stop();
+        Console.WriteLine(artistcount + @" artists loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
       }
     }
 
@@ -372,40 +384,12 @@ namespace Audioquarium
       }
     }
 
-    private void Next()
+    private int GrabAlbums()
     {
-      if (_shuffleSongs)
-        SongDataGrid.SelectedIndex = _rnd.Next(0, SongDataGrid.Items.Count);
-      else
-        SongDataGrid.SelectedIndex = SongDataGrid.SelectedIndex + 1;
-
-      _selectedSong = SongDataGrid.SelectedItem as Itemsource.Songs;
-
-      if (_selectedSong != null)
-      {
-        Mplayer.Open(new Uri(_selectedSong.FileName));
-        Mplayer.Play();
-        GetAlbumart();
-        PlayPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
-
-        _audioPlaying = true;
-        if (_selectedSong.Name == null)
-          NowPlayingSong.Content = _selectedSong.AltName + " - " + _selectedSong.Artist;
-        else
-          NowPlayingSong.Content = _selectedSong.Name + " - " + _selectedSong.Artist;
-        NowPlayingAlbum.Text = _selectedSong.Album;
-        NowPlayingTrack.Text = _selectedSong.Track;
-      }
-    }
-
-    private void GrabAlbums()
-    {
-      Stopwatch watch = new Stopwatch();
-      watch.Start();
-
       WrapPanel.Children.Clear();
       var song = Itemsource.SongLibrary;
       var noduplicates = song.GroupBy(x => x.Album).Select(x => x.First()).ToList();
+      int albumCount = 0;
 
       foreach (var item in noduplicates)
       {
@@ -444,19 +428,18 @@ namespace Audioquarium
           newTile.Foreground = Brushes.White;
           newTile.Background = (Brush) FindResource("AccentColorBrush2");
         }
-
+        albumCount++;
         WrapPanel.Children.Add(newTile);
       }
-      watch.Stop();
-      Console.WriteLine(@"Album art loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
+      return albumCount;
     }
 
-    private void GrabArtists()
+    private int GrabArtists()
     {
       bool isGray = false;
       WrapPanel.Children.Clear();
       var songs = Itemsource.SongLibrary.GroupBy(x => x.Artist).Select(x => x.First()).ToList();
-
+      int artistCount = 0;
       foreach (var song in songs)
       {
         Tile newTile = new Tile
@@ -483,15 +466,14 @@ namespace Audioquarium
           newTile.Background = (Brush) FindResource("AccentColorBrush3");
           isGray = false;
         }
-
+        artistCount++;
         WrapPanel.Children.Add(newTile);
-        //Console.WriteLine(title);
       }
+      return artistCount;
     }
 
     private void Album_OnClick(object sender, RoutedEventArgs e)
     {
-      //_selectedSong = SongDataGrid.SelectedItem as Itemsource.Songs;
       List<Itemsource.Songs> album = Itemsource.SongLibrary.ToList();
 
       var tile = sender as Tile;
@@ -568,19 +550,16 @@ namespace Audioquarium
 
     private void Artist_OnClick(object sender, RoutedEventArgs e)
     {
-      List<Itemsource.Songs> artist = Itemsource.SongLibrary.ToList();
-
       var tile = sender as Tile;
       if (tile != null)
       {
         string content = tile.Title;
-        artist = artist.Where(x => x.Artist == content).ToList();
+        List<Itemsource.Songs> artist = Itemsource.SongLibrary.Where(x => x.Artist == content).ToList();
         SongDataGrid.ItemsSource = artist;
 
         if (!Mplayer.HasAudio)
         {
           SongDataGrid.SelectedIndex = 0;
-          _selectedSong = SongDataGrid.SelectedItem as Itemsource.Songs;
           if (_selectedSong != null)
           {
             var tagFile = File.Create(_selectedSong.FileName);
@@ -613,7 +592,6 @@ namespace Audioquarium
           }
         }
       }
-
       ScrollViewer.Visibility = Visibility.Hidden;
       SongDataGrid.Visibility = Visibility.Visible;
     }
@@ -696,6 +674,32 @@ namespace Audioquarium
           NowPlayingAlbum.Text = _selectedSong.Album;
           NowPlayingTrack.Text = _selectedSong.Track;
         }
+      }
+    }
+
+    private void Next()
+    {
+      if (_shuffleSongs)
+        SongDataGrid.SelectedIndex = _rnd.Next(0, SongDataGrid.Items.Count);
+      else
+        SongDataGrid.SelectedIndex = SongDataGrid.SelectedIndex + 1;
+
+      _selectedSong = SongDataGrid.SelectedItem as Itemsource.Songs;
+
+      if (_selectedSong != null)
+      {
+        Mplayer.Open(new Uri(_selectedSong.FileName));
+        Mplayer.Play();
+        GetAlbumart();
+        PlayPause.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("Pause") };
+
+        _audioPlaying = true;
+        if (_selectedSong.Name == null)
+          NowPlayingSong.Content = _selectedSong.AltName + " - " + _selectedSong.Artist;
+        else
+          NowPlayingSong.Content = _selectedSong.Name + " - " + _selectedSong.Artist;
+        NowPlayingAlbum.Text = _selectedSong.Album;
+        NowPlayingTrack.Text = _selectedSong.Track;
       }
     }
 
@@ -862,6 +866,11 @@ namespace Audioquarium
           Stretch = Stretch.Uniform
         };
       }
+    }
+
+    private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+    {
+      Process.Start(e.Uri.ToString());
     }
   }
 }

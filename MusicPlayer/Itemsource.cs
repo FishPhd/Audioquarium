@@ -18,6 +18,7 @@ namespace Audioquarium
       SongLibrary?.Clear();
 
       var filetypes = new[] {"*.mp3", "*.wav", "*.aac", "*.flac", "*.wma"};
+      int songCount = 0;
 
       List<string> files = new List<string>();
 
@@ -82,6 +83,7 @@ namespace Audioquarium
               AltName = Path.GetFileNameWithoutExtension(file)
             });
           }
+          songCount++;
         }
         catch
         {
@@ -90,7 +92,7 @@ namespace Audioquarium
       }
 
       watch.Stop();
-      Console.WriteLine(@"Songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
+      Console.WriteLine(songCount + @" songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
     }
 
     private static List<string> GetFiles(string path, string pattern)
