@@ -8,14 +8,14 @@ namespace Audioquarium
 {
   internal class Itemsource
   {
-    public static List<Songs> Info = new List<Songs>();
+    public static readonly List<Songs> SongLibrary = new List<Songs>();
 
     public static void LoadSongs(string path)
     {
       Stopwatch watch = new Stopwatch();
       watch.Start();
 
-      Info.Clear();
+      SongLibrary?.Clear();
 
       var filetypes = new[] {"*.mp3", "*.wav", "*.aac", "*.flac", "*.wma"};
 
@@ -26,10 +26,13 @@ namespace Audioquarium
 
       foreach (var file in files)
       {
+        try
+        {
           var tagFile = File.Create(file);
+
           if (tagFile.Tag.Title == null)
           {
-            Info?.Add(new Songs
+            SongLibrary?.Add(new Songs
             {
               Name = Path.GetFileNameWithoutExtension(file),
               Artist = tagFile.Tag.FirstAlbumArtist,
@@ -42,7 +45,7 @@ namespace Audioquarium
           }
           else if (tagFile.Tag.FirstAlbumArtist == null)
           {
-            Info?.Add(new Songs
+            SongLibrary?.Add(new Songs
             {
               Name = Path.GetFileNameWithoutExtension(file),
               Artist = tagFile.Tag.Performers[0],
@@ -55,7 +58,7 @@ namespace Audioquarium
           }
           else if (tagFile.Tag.FirstAlbumArtist == null && tagFile.Tag.Title == null)
           {
-            Info?.Add(new Songs
+            SongLibrary?.Add(new Songs
             {
               Name = Path.GetFileNameWithoutExtension(file),
               Artist = tagFile.Tag.Performers[0],
@@ -68,7 +71,7 @@ namespace Audioquarium
           }
           else
           {
-            Info?.Add(new Songs
+            SongLibrary?.Add(new Songs
             {
               Name = tagFile.Tag.Title,
               Artist = tagFile.Tag.FirstAlbumArtist,
@@ -79,23 +82,24 @@ namespace Audioquarium
               AltName = Path.GetFileNameWithoutExtension(file)
             });
           }
+        }
+        catch
+        {
+          Console.WriteLine(@"Metadata could not be created for " + file);
+        }
       }
 
       watch.Stop();
-      Console.WriteLine (@"Songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
+      Console.WriteLine(@"Songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
     }
 
     private static List<string> GetFiles(string path, string pattern)
     {
       var files = new List<string>();
 
-      try
-      {
-        files.AddRange(Directory.GetFiles(path, pattern, SearchOption.TopDirectoryOnly));
-        foreach (var directory in Directory.GetDirectories(path))
-          files.AddRange(GetFiles(directory, pattern));
-      }
-      catch (UnauthorizedAccessException) { }
+      files.AddRange(Directory.GetFiles(path, pattern, SearchOption.TopDirectoryOnly));
+      foreach (var directory in Directory.GetDirectories(path))
+        files.AddRange(GetFiles(directory, pattern));
 
       return files;
     }
@@ -112,4 +116,3 @@ namespace Audioquarium
     }
   }
 }
- 
