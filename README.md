@@ -1,8 +1,8 @@
-# Audioquarium
+##Audioquarium <img src="http://i.imgur.com/LjplVc8.png" width="60">
 
 ## Super Lightweight Audio Player, No BS
 
-![alt tag](http://i.imgur.com/xk0BGK9.jpg)
+![alt tag](http://i.imgur.com/4r3PEfL.png)
 
 Hit the settings icon to add your music directory, everything else should be common sense.
 
