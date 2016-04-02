@@ -1,6 +1,4 @@
 <img src="http://i.imgur.com/LjplVc8.png" width="120">
-#Audioquarium 
-
 
 ## Super Lightweight Audio Player, No BS
 
