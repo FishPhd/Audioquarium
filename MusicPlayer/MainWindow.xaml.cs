@@ -36,7 +36,7 @@ namespace Audioquarium
     private bool _dragStarted;
     private int _playerSize = 2; // Guppy(0) Minnow(1) Shark(2) Whale(3)
     private bool _repeatSong;
-    private readonly DispatcherTimer _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.5) };
+    private readonly DispatcherTimer _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.1) };
     private Itemsource.Songs _selectedSong;
     private bool _shuffleSongs;
     private bool _isWindowActive = true;
@@ -606,13 +606,14 @@ namespace Audioquarium
         var album = Itemsource.SongLibrary.Where(x => x.Album == content).ToList();
 
         SongGrid.ItemsSource = album;
-        if (_selectedSong != null)
+        if (Mplayer.HasAudio)
         {
           GetAlbumart();
         }
         else
         {
           SongGrid.SelectedIndex = 0;
+          _selectedSong = SongGrid.SelectedItem as Itemsource.Songs;
           GetAlbumart();
         }
         if (_selectedSong != null && !Mplayer.HasAudio)
@@ -864,12 +865,10 @@ namespace Audioquarium
     {
       if (Mplayer.HasAudio)
       {
-        _timer.Stop();
         _dragStarted = true;
         Mplayer.Position = TimeSpan.FromSeconds(ScrubBar.Value);
         Mplayer.IsMuted = false;
       }
-      _timer.Start();
       _dragStarted = false;
     }
 
@@ -903,13 +902,12 @@ namespace Audioquarium
 
     private void ScrubBar_OnMouseMove(object sender, MouseEventArgs e)
     {
-      Point currentPos = e.GetPosition(ScrubBar);
       Track track = ScrubBar.Template.FindName("PART_Track", ScrubBar) as Track;
 
       if (track != null)
       {
         GhostTime.Visibility = Visibility.Visible;
-        GhostTime.Content = TimeSpan.FromSeconds(track.ValueFromPoint(currentPos)).ToString(@"mm\:ss");
+        GhostTime.Content = TimeSpan.FromSeconds(track.ValueFromPoint(e.GetPosition(ScrubBar))).ToString(@"mm\:ss");
       }
     }
 
