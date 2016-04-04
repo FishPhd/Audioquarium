@@ -2,7 +2,7 @@
 
 namespace Audioquarium
 {
-  class Dictionaries
+  internal class Dictionaries
   {
     public static Dictionary<string, string> GetColor()
     {

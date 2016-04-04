@@ -12,17 +12,17 @@ namespace Audioquarium
 
     public static void LoadSongs(string path)
     {
-      Stopwatch watch = new Stopwatch();
+      var watch = new Stopwatch();
       watch.Start();
 
       SongLibrary?.Clear();
 
       var filetypes = new[] {"*.mp3", "*.wav", "*.aac", "*.flac", "*.wma"};
-      int songCount = 0;
+      var songCount = 0;
 
-      List<string> files = new List<string>();
+      var files = new List<string>();
 
-      foreach (string t in filetypes)
+      foreach (var t in filetypes)
         files.AddRange(GetFiles(path, t));
 
       foreach (var file in files)

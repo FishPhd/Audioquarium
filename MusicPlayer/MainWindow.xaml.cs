@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -11,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Threading;
 using MahApps.Metro;
 using MahApps.Metro.Controls;
@@ -19,23 +19,28 @@ using MouseKeyboardActivityMonitor;
 using MouseKeyboardActivityMonitor.WinApi;
 using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
+using DataGrid = System.Windows.Controls.DataGrid;
 using File = TagLib.File;
+using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 
 namespace Audioquarium
 {
   public partial class MainWindow
   {
     public static readonly MediaPlayer Mplayer = new MediaPlayer();
-    private readonly KeyboardHookListener m_keyboardListener;
+    private readonly KeyboardHookListener _mKeyboardListener;
     private readonly Random _rnd = new Random();
     private bool _audioPlaying;
-    private bool _audiouMuted;
-    private bool _dragStarted;
-    private bool _shuffleSongs;
-    private bool _repeatSong;
-    private Itemsource.Songs _selectedSong;
-    private int _playerSize = 2; // Guppy(0) Minnow(1) Shark(2) Whale(3)
+    private bool _audioMuted;
     private int _currentView; // Song(0) Album(1) Artist(2) 
+    private bool _dragStarted;
+    private int _playerSize = 2; // Guppy(0) Minnow(1) Shark(2) Whale(3)
+    private bool _repeatSong;
+    private readonly DispatcherTimer _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.5) };
+    private Itemsource.Songs _selectedSong;
+    private bool _shuffleSongs;
+    private bool _isWindowActive = true;
+    private string _keydata;
 
     public MainWindow()
     {
@@ -43,19 +48,18 @@ namespace Audioquarium
       Cfg.Initial(false);
       Load();
 
-      m_keyboardListener = new KeyboardHookListener(new GlobalHooker()) { Enabled = true };
-      m_keyboardListener.KeyDown += HookManager_KeyDown;
+      _mKeyboardListener = new KeyboardHookListener(new GlobalHooker()) {Enabled = true};
+      _mKeyboardListener.KeyDown += HookManager_KeyDown;
 
-      var timer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(0.5)};
-      timer.Tick += timer_Tick;
-      timer.Start();
+      _timer.Tick += timer_Tick;
+      _timer.Start();
     }
 
     private void timer_Tick(object sender, EventArgs e)
     {
       if (Mplayer.Source != null && Mplayer.NaturalDuration.HasTimeSpan)
       {
-        SongDataGrid.SelectedIndex = SongDataGrid.SelectedIndex;
+        SongGrid.SelectedIndex = SongGrid.SelectedIndex;
 
         ScrubBar.Minimum = 0;
         ScrubBar.Maximum = Mplayer.NaturalDuration.TimeSpan.TotalSeconds;
@@ -65,8 +69,12 @@ namespace Audioquarium
           ScrubBar.Value = Mplayer.Position.TotalSeconds;
           if (_selectedSong != null && Mplayer.HasAudio)
           {
-            ScrubTime.Content = Mplayer.Position.ToString(@"mm\:ss") + " - " + _selectedSong.Length;
+            ScrubTime.Content = TimeSpan.FromSeconds(ScrubBar.Value).ToString(@"mm\:ss") + " - " + _selectedSong.Length;
           }
+        }
+        else if (_dragStarted)
+        {
+          ScrubTime.Content = TimeSpan.FromSeconds(ScrubBar.Value).ToString(@"mm\:ss") + " - " + _selectedSong.Length;
         }
       }
 
@@ -75,10 +83,10 @@ namespace Audioquarium
           && Mplayer.Position.TotalSeconds == Mplayer.NaturalDuration.TimeSpan.TotalSeconds)
       {
         if (_shuffleSongs)
-          SongDataGrid.SelectedIndex = _rnd.Next(0, SongDataGrid.Items.Count);
+          SongGrid.SelectedIndex = _rnd.Next(0, SongGrid.Items.Count);
         else if (_repeatSong)
-          SongDataGrid.SelectedIndex = SongDataGrid.SelectedIndex;
-        else if (_selectedSong == SongDataGrid.SelectedItem as Itemsource.Songs)
+          SongGrid.SelectedIndex = SongGrid.SelectedIndex;
+        else if (_selectedSong == SongGrid.SelectedItem as Itemsource.Songs)
           Next(); // If the current song is the same as the one playing then go to next
 
         if (_selectedSong != null)
@@ -99,15 +107,17 @@ namespace Audioquarium
       }
     }
 
-    private void HookManager_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+    private void HookManager_KeyDown(object sender, KeyEventArgs e)
     {
-      if (e.KeyData.ToString() == Key.MediaPlayPause.ToString() || e.KeyData.ToString() == Key.Play.ToString())
+      _keydata = e.KeyData.ToString();
+      _isWindowActive = Application.Current.MainWindow.IsActive;
+      if (_keydata  == Key.MediaPlayPause.ToString() || _keydata == Key.Play.ToString() || (_isWindowActive && _keydata == Key.Space.ToString()))
         Play();
-      else if (e.KeyData.ToString() == Key.MediaNextTrack.ToString() || e.KeyData.ToString() == Key.Next.ToString())
+      else if (_keydata == Key.MediaNextTrack.ToString() || _keydata == Key.Next.ToString() || (_isWindowActive && _keydata == Key.Right.ToString()))
         Next();
-      else if (e.KeyData.ToString() == Key.MediaPreviousTrack.ToString())
+      else if (_keydata == Key.MediaPreviousTrack.ToString() || (_isWindowActive && _keydata == Key.Left.ToString()))
         Previous();
-      else if (e.KeyData.ToString() == Key.VolumeMute.ToString())
+      else if (_keydata == Key.VolumeMute.ToString())
         Mute();
     }
 
@@ -116,10 +126,14 @@ namespace Audioquarium
       if (Cfg.ConfigFile["Music.Directory1"] != "")
       {
         Itemsource.LoadSongs(Cfg.ConfigFile["Music.Directory1"]);
-        SongDataGrid.ItemsSource = Itemsource.SongLibrary;
+        SongGrid.ItemsSource = Itemsource.SongLibrary;
+        NoLoadLabel.Visibility = Visibility.Hidden;
       }
       else
-        SongDataGrid.ItemsSource = null;
+      {
+        NoLoadLabel.Visibility = Visibility.Visible;
+        SongGrid.ItemsSource = null;
+      }
       ThemeManager.ChangeAppStyle(Application.Current, ThemeManager.GetAccent(Cfg.ConfigFile["Player.Color"]),
         ThemeManager.GetAppTheme("BaseDark"));
       Colors.SelectedValue = Cfg.ConfigFile["Player.Color"];
@@ -128,9 +142,9 @@ namespace Audioquarium
 
     private void SongGrid_OnLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-      _selectedSong = SongDataGrid.CurrentItem as Itemsource.Songs;
+      _selectedSong = SongGrid.CurrentItem as Itemsource.Songs;
 
-      if (SongDataGrid.ItemsSource != null && _selectedSong != null) //&& selectedSong.FileName != _currentSong
+      if (SongGrid.ItemsSource != null && _selectedSong != null) //&& selectedSong.FileName != _currentSong
       {
         Mplayer.Open(new Uri(_selectedSong.FileName));
         //Console.WriteLine(selectedSong.FileName);
@@ -151,9 +165,12 @@ namespace Audioquarium
 
     private void GetAlbumart()
     {
-      var tagFile = File.Create(_selectedSong.FileName);
+      if (_selectedSong == null)
+        _selectedSong = SongGrid.SelectedItem as Itemsource.Songs;
+
       if (_selectedSong != null)
       {
+        var tagFile = File.Create(_selectedSong.FileName);
         try
         {
           var pic = tagFile.Tag.Pictures[0];
@@ -186,14 +203,111 @@ namespace Audioquarium
       Flyout.Header = header;
     }
 
+    private void ShrinkButton_Click(object sender, RoutedEventArgs e)
+    {
+      if (_playerSize > 0)
+        _playerSize--;
+
+      if (_playerSize == 2) // Whale->Shark
+      {
+        Application.Current.MainWindow.Height = 549;
+        Application.Current.MainWindow.Width = 900;
+        Application.Current.MainWindow.WindowState = WindowState.Normal;
+        ExpandButton.Visibility = Visibility.Visible;
+        LeftMainColumn.Width = new GridLength(1, GridUnitType.Star);
+        PlayerSizeRect.Fill = new VisualBrush
+        {
+          Visual = (Visual) FindResource("appbar_shark"),
+          Stretch = Stretch.Uniform
+        };
+      }
+      else if (_playerSize == 1) // Shark->Minnow
+      {
+        Application.Current.MainWindow.Height = 80;
+        Application.Current.MainWindow.Width = 400;
+        Application.Current.MainWindow.Topmost = true;
+        ScrubTime.Visibility = Visibility.Hidden;
+        ScrubPanel.Margin = new Thickness(160, 0, 20, 0);
+        PlayerSizeRect.Fill = new VisualBrush
+        {
+          Visual = (Visual) FindResource("appbar_minnow"),
+          Stretch = Stretch.Uniform
+        };
+      }
+      else if (_playerSize == 0) // Minnow->Guppy
+      {
+        Application.Current.MainWindow.Height = 80;
+        Application.Current.MainWindow.Width = 190;
+        ShrinkButton.Visibility = Visibility.Hidden;
+        ScrubPanel.Visibility = Visibility.Hidden;
+        PreviousButton.Margin = new Thickness(42, 18, 0, 0);
+        PlayerSizeRect.Fill = new VisualBrush
+        {
+          Visual = (Visual) FindResource("appbar_guppy"),
+          Stretch = Stretch.Uniform
+        };
+      }
+    }
+
+    private void ExpandButton_Click(object sender, RoutedEventArgs e)
+    {
+      if (_playerSize < 3)
+        _playerSize++;
+
+      if (_playerSize == 3) // Shark->Whale
+      {
+        Application.Current.MainWindow.WindowState = WindowState.Maximized;
+        ExpandButton.Visibility = Visibility.Hidden;
+        LeftMainColumn.Width = new GridLength(2, GridUnitType.Star);
+        PlayerSizeRect.Fill = new VisualBrush
+        {
+          Visual = (Visual) FindResource("appbar_whale"),
+          Stretch = Stretch.Uniform
+        };
+      }
+      else if (_playerSize == 2) // Minnow->Shark
+      {
+        Application.Current.MainWindow.Height = 549;
+        Application.Current.MainWindow.Width = 900;
+        Application.Current.MainWindow.Topmost = false;
+        ScrubPanel.Margin = new Thickness(175, 0, 20, 0);
+        ScrubTime.Visibility = Visibility.Visible;
+        PlayerSizeRect.Fill = new VisualBrush
+        {
+          Visual = (Visual) FindResource("appbar_shark"),
+          Stretch = Stretch.Uniform
+        };
+      }
+      else if (_playerSize == 1) // Guppy->Minnow
+      {
+        Application.Current.MainWindow.Height = 80;
+        Application.Current.MainWindow.Width = 400;
+        ShrinkButton.Visibility = Visibility.Visible;
+        ScrubPanel.Visibility = Visibility.Visible;
+        PreviousButton.Margin = new Thickness(30, 18, 0, 0);
+        PlayerSizeRect.Fill = new VisualBrush
+        {
+          Visual = (Visual) FindResource("appbar_minnow"),
+          Stretch = Stretch.Uniform
+        };
+      }
+    }
+
+    private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+      Process.Start(e.Uri.ToString());
+    }
+
     #region Settings
 
+    /*
     private void Directory1_OnTextChanged(object sender, TextChangedEventArgs e)
     {
       if (!IsLoaded || Directory1Text.Text == "")
         return;
-      Load();
+      //Load();
     }
+    */
 
     private void PlayerSettings_OnClick(object sender, RoutedEventArgs e)
     {
@@ -203,6 +317,16 @@ namespace Audioquarium
     private void btnClear1_OnClick(object sender, RoutedEventArgs e)
     {
       Directory1Text.Text = "";
+      Mplayer.Close();
+      AlbumArt.Source = null;
+      AlbumArtToolTip.ToolTip = "Album";
+      Placeholder.Visibility = Visibility.Visible;
+      Itemsource.SongLibrary?.Clear();
+      ScrubTime.Content = "00:00 / 00:00";
+      ScrubBar.Value = 0;
+      NowPlayingAlbum.Text = "Album";
+      NowPlayingTrack.Text = "Track";
+      NowPlayingSong.Content = "Song - Artist";
       Cfg.SetVariable("Music.Directory1", "", ref Cfg.ConfigFile);
       Cfg.SaveConfigFile("music_prefs.cfg", Cfg.ConfigFile);
       Load();
@@ -263,7 +387,7 @@ namespace Audioquarium
     {
       var objname = ((Button) sender).Name;
       var dialog = new CommonOpenFileDialog {IsFolderPicker = true};
-      CommonFileDialogResult result = dialog.ShowDialog();
+      var result = dialog.ShowDialog();
 
       if (result == CommonFileDialogResult.Ok)
       {
@@ -278,11 +402,11 @@ namespace Audioquarium
     {
       if (_currentView != 0)
       {
-        Stopwatch watch = new Stopwatch();
+        var watch = new Stopwatch();
         watch.Start();
 
         _currentView = 0; // Set our view to songs grid
-        SongDataGrid.ItemsSource = Itemsource.SongLibrary;
+        SongGrid.ItemsSource = Itemsource.SongLibrary;
 
         //Sort("Name");
         //songSorting.Background = Brushes.LightGray;
@@ -301,7 +425,7 @@ namespace Audioquarium
         AlbumsSelector.Visibility = Visibility.Hidden;
         SongsSelector.Visibility = Visibility.Visible;
 
-        SongDataGrid.Visibility = Visibility.Visible;
+        SongGrid.Visibility = Visibility.Visible;
         ScrollViewer.Visibility = Visibility.Hidden;
         watch.Stop();
         Console.WriteLine(@"Songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
@@ -310,13 +434,13 @@ namespace Audioquarium
 
     private void AlbumSorting_OnClick(object sender, RoutedEventArgs e)
     {
-      if (_currentView != 1)
+      if (_currentView != 1 || _currentView == 1 && SongGrid.Visibility == Visibility.Visible)
       {
-        Stopwatch watch = new Stopwatch();
+        var watch = new Stopwatch();
         watch.Start();
-        int albumCount = GrabAlbums();
+        var albumCount = GrabAlbums();
 
-        Sort("Album", SongDataGrid);
+        Sort("Album", SongGrid);
         _currentView = 1; // Set our view to album grid
 
         //albumSorting.Background = Brushes.LightGray;
@@ -334,7 +458,7 @@ namespace Audioquarium
         AlbumsSelector.Visibility = Visibility.Visible;
         SongsSelector.Visibility = Visibility.Hidden;
 
-        SongDataGrid.Visibility = Visibility.Hidden;
+        SongGrid.Visibility = Visibility.Hidden;
         ScrollViewer.Visibility = Visibility.Visible;
         watch.Stop();
         Console.WriteLine(albumCount + @" albums and art loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
@@ -345,11 +469,11 @@ namespace Audioquarium
     {
       if (_currentView != 2)
       {
-        Stopwatch watch = new Stopwatch();
+        var watch = new Stopwatch();
         watch.Start();
         _currentView = 2; // Set our view to artist grid
-        Sort("Artist", SongDataGrid);
-        int artistcount = GrabArtists();
+        Sort("Artist", SongGrid);
+        var artistcount = GrabArtists();
 
         //albumSorting.Background = Brushes.LightGray;
         ArtistSortingIcon.Fill = (Brush) FindResource("AccentColorBrush");
@@ -366,7 +490,7 @@ namespace Audioquarium
         AlbumsSelector.Visibility = Visibility.Hidden;
         SongsSelector.Visibility = Visibility.Hidden;
 
-        SongDataGrid.Visibility = Visibility.Hidden;
+        SongGrid.Visibility = Visibility.Hidden;
         ScrollViewer.Visibility = Visibility.Visible;
         watch.Stop();
         Console.WriteLine(artistcount + @" artists loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
@@ -377,7 +501,7 @@ namespace Audioquarium
     {
       if (grid.ItemsSource != null)
       {
-        ICollectionView dataView = CollectionViewSource.GetDefaultView(SongDataGrid.ItemsSource);
+        var dataView = CollectionViewSource.GetDefaultView(SongGrid.ItemsSource);
         dataView.SortDescriptions.Clear();
         dataView.SortDescriptions.Add(new SortDescription(col, ListSortDirection.Ascending));
         dataView.Refresh();
@@ -389,13 +513,13 @@ namespace Audioquarium
       WrapPanel.Children.Clear();
       var song = Itemsource.SongLibrary;
       var noduplicates = song.GroupBy(x => x.Album).Select(x => x.First()).ToList();
-      int albumCount = 0;
+      var albumCount = 0;
 
       foreach (var item in noduplicates)
       {
         var tagFile = File.Create(item.FileName);
 
-        Tile newTile = new Tile
+        var newTile = new Tile
         {
           VerticalContentAlignment = VerticalAlignment.Bottom,
           Width = 175,
@@ -436,13 +560,13 @@ namespace Audioquarium
 
     private int GrabArtists()
     {
-      bool isGray = false;
+      var isGray = false;
       WrapPanel.Children.Clear();
       var songs = Itemsource.SongLibrary.GroupBy(x => x.Artist).Select(x => x.First()).ToList();
-      int artistCount = 0;
+      var artistCount = 0;
       foreach (var song in songs)
       {
-        Tile newTile = new Tile
+        var newTile = new Tile
         {
           Width = 600,
           Height = 50,
@@ -474,37 +598,21 @@ namespace Audioquarium
 
     private void Album_OnClick(object sender, RoutedEventArgs e)
     {
-      List<Itemsource.Songs> album = Itemsource.SongLibrary.ToList();
-
       var tile = sender as Tile;
       if (tile != null)
       {
-        string content = tile.Title;
+        var content = tile.Title;
+        var album = Itemsource.SongLibrary.Where(x => x.Album == content).ToList();
+
+        SongGrid.ItemsSource = album;
         if (_selectedSong != null)
         {
-          album = album.Where(x => x.Album == content).ToList();
-          SongDataGrid.ItemsSource = album;
-          var tagFile = File.Create(_selectedSong.FileName);
-          SongDataGrid.SelectedIndex = 0;
-          try
-          {
-            var pic = tagFile.Tag.Pictures[0];
-            var ms = new MemoryStream(pic.Data.Data);
-            ms.Seek(0, SeekOrigin.Begin);
-
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.StreamSource = ms;
-            bitmap.EndInit();
-
-            var img = new Image {Source = bitmap};
-            AlbumArt.Source = img.Source;
-            Placeholder.Visibility = Visibility.Hidden;
-          }
-          catch
-          {
-            Placeholder.Visibility = Visibility.Visible;
-          }
+          GetAlbumart();
+        }
+        else
+        {
+          SongGrid.SelectedIndex = 0;
+          GetAlbumart();
         }
         if (_selectedSong != null && !Mplayer.HasAudio)
         {
@@ -514,19 +622,19 @@ namespace Audioquarium
         }
       }
       ScrollViewer.Visibility = Visibility.Hidden;
-      SongDataGrid.Visibility = Visibility.Visible;
+      SongGrid.Visibility = Visibility.Visible;
     }
 
     private void AlbumArt_MouseDown(object sender, MouseButtonEventArgs e)
     {
-      List<Itemsource.Songs> album = Itemsource.SongLibrary.ToList();
+      var album = Itemsource.SongLibrary.ToList();
 
       if (_selectedSong != null)
       {
-        string content = _selectedSong.Album;
+        var content = _selectedSong.Album;
         album = album.Where(x => x.Album == content).ToList();
       }
-      SongDataGrid.ItemsSource = album;
+      SongGrid.ItemsSource = album;
       _currentView = 1; // Set our view to songs grid
 
       //albumSorting.Background = Brushes.LightGray;
@@ -544,7 +652,7 @@ namespace Audioquarium
       AlbumsSelector.Visibility = Visibility.Visible;
       SongsSelector.Visibility = Visibility.Hidden;
 
-      SongDataGrid.Visibility = Visibility.Visible;
+      SongGrid.Visibility = Visibility.Visible;
       ScrollViewer.Visibility = Visibility.Hidden;
     }
 
@@ -553,13 +661,13 @@ namespace Audioquarium
       var tile = sender as Tile;
       if (tile != null)
       {
-        string content = tile.Title;
-        List<Itemsource.Songs> artist = Itemsource.SongLibrary.Where(x => x.Artist == content).ToList();
-        SongDataGrid.ItemsSource = artist;
-
+        var content = tile.Title;
+        var artist = Itemsource.SongLibrary.Where(x => x.Artist == content).ToList();
+        SongGrid.ItemsSource = artist;
+        //GetAlbumart();
         if (!Mplayer.HasAudio)
         {
-          SongDataGrid.SelectedIndex = 0;
+          SongGrid.SelectedIndex = 0;
           if (_selectedSong != null)
           {
             var tagFile = File.Create(_selectedSong.FileName);
@@ -593,15 +701,15 @@ namespace Audioquarium
         }
       }
       ScrollViewer.Visibility = Visibility.Hidden;
-      SongDataGrid.Visibility = Visibility.Visible;
+      SongGrid.Visibility = Visibility.Visible;
     }
 
     private void Play()
     {
       if (Mplayer.Source == null && _shuffleSongs == false)
       {
-        SongDataGrid.SelectedIndex = 0;
-        _selectedSong = SongDataGrid.SelectedItem as Itemsource.Songs;
+        SongGrid.SelectedIndex = 0;
+        _selectedSong = SongGrid.SelectedItem as Itemsource.Songs;
 
         if (_selectedSong != null)
         {
@@ -621,8 +729,8 @@ namespace Audioquarium
       }
       else if (Mplayer.Source == null && _shuffleSongs)
       {
-        SongDataGrid.SelectedIndex = _rnd.Next(0, SongDataGrid.Items.Count);
-        _selectedSong = SongDataGrid.SelectedItem as Itemsource.Songs;
+        SongGrid.SelectedIndex = _rnd.Next(0, SongGrid.Items.Count);
+        _selectedSong = SongGrid.SelectedItem as Itemsource.Songs;
 
         if (_selectedSong != null)
         {
@@ -653,14 +761,14 @@ namespace Audioquarium
 
     private void Previous()
     {
-      if (SongDataGrid.SelectedIndex != 0)
+      if (SongGrid.SelectedIndex != 0)
       {
         if (Mplayer.Position.TotalSeconds > 3)
-          SongDataGrid.SelectedIndex = SongDataGrid.SelectedIndex;
+          SongGrid.SelectedIndex = SongGrid.SelectedIndex;
         else
-          SongDataGrid.SelectedIndex = SongDataGrid.SelectedIndex - 1;
+          SongGrid.SelectedIndex = SongGrid.SelectedIndex - 1;
 
-        _selectedSong = SongDataGrid.SelectedItem as Itemsource.Songs;
+        _selectedSong = SongGrid.SelectedItem as Itemsource.Songs;
 
         if (_selectedSong != null)
         {
@@ -680,18 +788,18 @@ namespace Audioquarium
     private void Next()
     {
       if (_shuffleSongs)
-        SongDataGrid.SelectedIndex = _rnd.Next(0, SongDataGrid.Items.Count);
+        SongGrid.SelectedIndex = _rnd.Next(0, SongGrid.Items.Count);
       else
-        SongDataGrid.SelectedIndex = SongDataGrid.SelectedIndex + 1;
+        SongGrid.SelectedIndex = SongGrid.SelectedIndex + 1;
 
-      _selectedSong = SongDataGrid.SelectedItem as Itemsource.Songs;
+      _selectedSong = SongGrid.SelectedItem as Itemsource.Songs;
 
       if (_selectedSong != null)
       {
         Mplayer.Open(new Uri(_selectedSong.FileName));
         Mplayer.Play();
         GetAlbumart();
-        PlayPause.OpacityMask = new VisualBrush { Visual = (Visual)FindResource("Pause") };
+        PlayPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
 
         _audioPlaying = true;
         if (_selectedSong.Name == null)
@@ -705,19 +813,19 @@ namespace Audioquarium
 
     private void Mute()
     {
-      if (_audiouMuted)
+      if (_audioMuted)
       {
         MuteButton.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("appbar_sound_2")};
         MuteButton.Width = 20;
         Mplayer.IsMuted = false;
-        _audiouMuted = false;
+        _audioMuted = false;
       }
       else
       {
         MuteButton.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("appbar_sound_0")};
         MuteButton.Width = 10;
         Mplayer.IsMuted = true;
-        _audiouMuted = true;
+        _audioMuted = true;
       }
     }
 
@@ -753,10 +861,12 @@ namespace Audioquarium
     {
       if (Mplayer.HasAudio)
       {
+        _timer.Stop();
         _dragStarted = true;
         Mplayer.Position = TimeSpan.FromSeconds(ScrubBar.Value);
         Mplayer.IsMuted = false;
       }
+      _timer.Start();
       _dragStarted = false;
     }
 
@@ -787,90 +897,5 @@ namespace Audioquarium
     }
 
     #endregion
-
-    private void ShrinkButton_Click(object sender, RoutedEventArgs e)
-    {
-      if (_playerSize > 0)
-        _playerSize--;
-
-      if (_playerSize == 2) // Whale->Shark
-      {
-        Application.Current.MainWindow.Height = 549;
-        Application.Current.MainWindow.Width = 900;
-        Application.Current.MainWindow.WindowState = WindowState.Normal;
-        ExpandButton.Visibility = Visibility.Visible;
-        PlayerSizeRect.Fill = new VisualBrush
-        {
-          Visual = (Visual) FindResource("appbar_shark"),
-          Stretch = Stretch.Uniform
-        };
-      }
-      else if (_playerSize == 1) // Shark->Minnow
-      {
-        Application.Current.MainWindow.Height = 80;
-        Application.Current.MainWindow.Width = 400;
-        Application.Current.MainWindow.Topmost = true;
-        PlayerSizeRect.Fill = new VisualBrush
-        {
-          Visual = (Visual) FindResource("appbar_minnow"),
-          Stretch = Stretch.Uniform
-        };
-      }
-      else if (_playerSize == 0) // Minnow->Guppy
-      {
-        Application.Current.MainWindow.Height = 80;
-        Application.Current.MainWindow.Width = 190;
-        ShrinkButton.Visibility = Visibility.Hidden;
-        PlayerSizeRect.Fill = new VisualBrush
-        {
-          Visual = (Visual) FindResource("appbar_guppy"),
-          Stretch = Stretch.Uniform
-        };
-      }
-    }
-
-    private void ExpandButton_Click(object sender, RoutedEventArgs e)
-    {
-      if (_playerSize < 3)
-        _playerSize++;
-
-      if (_playerSize == 3) // Shark->Whale
-      {
-        Application.Current.MainWindow.WindowState = WindowState.Maximized;
-        ExpandButton.Visibility = Visibility.Hidden;
-        PlayerSizeRect.Fill = new VisualBrush
-        {
-          Visual = (Visual) FindResource("appbar_whale"),
-          Stretch = Stretch.Uniform
-        };
-      }
-      else if (_playerSize == 2) // Minnow->Shark
-      {
-        Application.Current.MainWindow.Height = 549;
-        Application.Current.MainWindow.Width = 900;
-        Application.Current.MainWindow.Topmost = false;
-        PlayerSizeRect.Fill = new VisualBrush
-        {
-          Visual = (Visual) FindResource("appbar_shark"),
-          Stretch = Stretch.Uniform
-        };
-      }
-      else if (_playerSize == 1) // Guppy->Minnow
-      {
-        Application.Current.MainWindow.Height = 80;
-        Application.Current.MainWindow.Width = 400;
-        ShrinkButton.Visibility = Visibility.Visible;
-        PlayerSizeRect.Fill = new VisualBrush
-        {
-          Visual = (Visual) FindResource("appbar_minnow"),
-          Stretch = Stretch.Uniform
-        };
-      }
-    }
-
-    private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
-    {
-      Process.Start(e.Uri.ToString());
-    }
   }
 }

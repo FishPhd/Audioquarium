@@ -56,7 +56,7 @@
               <Label>Music Directory:</Label>
               <TextBox x:Name="Directory1Text" IsReadOnly="True" controls:TextBoxHelper.Watermark="None"
                        Margin="10,0,0,0"
-                       Height="20" Width="200" TextChanged="Directory1_OnTextChanged" />
+                       Height="20" Width="200"/>
               <Button Style="{StaticResource AccentedSquareButtonStyle}" x:Name="Directory1"
                       controls:ButtonHelper.PreserveTextCase="True" Height="30" Width="70"
                       Click="btnChange_OnClick" Margin="15,0,10,0" Content="Change"
@@ -74,23 +74,29 @@
                         DisplayMemberPath="Key" Height="15" />
             </StackPanel>
             <TextBlock Margin="10,15,0,0">
-              <Hyperlink Foreground="Red" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="http://issues.audioquarium.net/">Report all bugs here!</Hyperlink>
+              <Hyperlink Foreground="Red" RequestNavigate="Hyperlink_RequestNavigate"
+                         NavigateUri="http://issues.audioquarium.net/">
+                Report all bugs here!
+              </Hyperlink>
             </TextBlock>
             <TextBlock Margin="10,10,0,0">
-              <Hyperlink Foreground="AliceBlue" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="http://download.audioquarium.net/">Keep up to date here!</Hyperlink>
+              <Hyperlink Foreground="AliceBlue" RequestNavigate="Hyperlink_RequestNavigate"
+                         NavigateUri="http://download.audioquarium.net/">
+                Keep up to date here!
+              </Hyperlink>
             </TextBlock>
           </StackPanel>
         </Grid>
       </controls:Flyout>
     </controls:FlyoutsControl>
   </controls:MetroWindow.Flyouts>
-  <Grid>
+  <Grid x:Name="MainGrid">
     <Grid.RowDefinitions>
       <RowDefinition />
       <RowDefinition Height="50" />
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*" />
+      <ColumnDefinition x:Name="LeftMainColumn" Width="1*" />
       <ColumnDefinition Width="2*" />
     </Grid.ColumnDefinitions>
 
@@ -224,8 +230,8 @@
         </StackPanel>
       </Grid>
       <Grid x:Name="AlbumArtToolTip" Grid.Row="1" MouseDown="AlbumArt_MouseDown">
-        <Viewbox Stretch="Uniform" MinHeight="297" >
-            <Image x:Name="AlbumArt" VerticalAlignment="Bottom"/>
+        <Viewbox Stretch="Uniform" MinHeight="297">
+          <Image x:Name="AlbumArt" VerticalAlignment="Bottom" />
         </Viewbox>
         <Rectangle x:Name="Placeholder" VerticalAlignment="Center" HorizontalAlignment="Center" Width="125"
                    Height="150" Margin="0,0,20,0"
@@ -306,7 +312,7 @@
     <Grid Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="1" x:Name="ControlsGrid" MaxHeight="50" MinHeight="50"
           VerticalAlignment="Bottom" Background="{DynamicResource AccentColorBrush}" Height="50">
       <StackPanel Orientation="Horizontal">
-        <Rectangle x:Name="PreviousText" Width="15" Height="15" Margin="30,18,0,0" VerticalAlignment="Top"
+        <Rectangle x:Name="PreviousButton" Width="15" Height="15" Margin="30,18,0,0" VerticalAlignment="Top"
                    ToolTip="Previous Song" MouseDown="PreviousSong_OnClick">
           <Rectangle.OpacityMask>
             <VisualBrush Visual="{StaticResource Previous}" />
@@ -355,19 +361,18 @@
           </Rectangle.Style>
         </Rectangle>
       </StackPanel>
-      <Grid Margin="200,0,20,0" Width="Auto">
-        <StackPanel Orientation="Vertical">
+      <StackPanel x:Name="ScrubPanel" Margin="175,0,20,0" Width="Auto" Orientation="Vertical">
           <Label x:Name="NowPlayingSong" Margin="0,0,0,0">Song - Artist</Label>
           <Slider x:Name="ScrubBar" IsMoveToPointEnabled="True" PreviewMouseUp="scrubBar_OnValueChanged"
                   Thumb.DragStarted="Slider_DragStarted" Style="{DynamicResource FlatSlider}"
                   Foreground="{DynamicResource AccentColorBrush}" Width="Auto" Height="10.3"
                   TickFrequency="0.5" />
         </StackPanel>
-        <Label HorizontalAlignment="Right" x:Name="ScrubTime" Margin="0,0,0,26">00:00 / 00:00</Label>
-      </Grid>
+      <Label HorizontalAlignment="Right" x:Name="ScrubTime" Margin="0,0,20,26">00:00 / 00:00</Label>
     </Grid>
     <Grid Grid.Column="1" Grid.Row="0">
-      <DataGrid x:Name="SongDataGrid" CanUserResizeColumns="True" CanUserReorderColumns="False"
+      <Label x:Name="NoLoadLabel" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource AccentColorBrush}" FontSize="16">Open settings to load songs</Label>
+      <DataGrid x:Name="SongGrid" CanUserResizeColumns="True" CanUserReorderColumns="False"
                 CanUserResizeRows="False" MouseLeftButtonDown="SongGrid_OnLeftButtonDown"
                 IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="None"
                 Style="{StaticResource AzureDataGrid}" VerticalAlignment="Top">
