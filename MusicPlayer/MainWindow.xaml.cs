@@ -123,21 +123,22 @@ namespace Audioquarium
 
     public void Load()
     {
-      if (Cfg.ConfigFile["Music.Directory1"] != "")
+      if (Cfg.ConfigFile["Music.Directory1"] != "") // Check if music directory is empty
       {
         Itemsource.LoadSongs(Cfg.ConfigFile["Music.Directory1"]);
         SongGrid.ItemsSource = Itemsource.SongLibrary;
         NoLoadLabel.Visibility = Visibility.Hidden;
       }
-      else
+      else // Empty setting load nothing (saves a load error)
       {
         NoLoadLabel.Visibility = Visibility.Visible;
         SongGrid.ItemsSource = null;
       }
+      // Get the color they had
       ThemeManager.ChangeAppStyle(Application.Current, ThemeManager.GetAccent(Cfg.ConfigFile["Player.Color"]),
         ThemeManager.GetAppTheme("BaseDark"));
-      Colors.SelectedValue = Cfg.ConfigFile["Player.Color"];
-      Directory1Text.Text = Cfg.ConfigFile["Music.Directory1"];
+      Colors.SelectedValue = Cfg.ConfigFile["Player.Color"]; // Color setting set to color (dictionaries.s)
+      Directory1Text.Text = Cfg.ConfigFile["Music.Directory1"]; // Music directory set to music directory (or empty string)
     }
 
     private void SongGrid_OnLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -147,8 +148,8 @@ namespace Audioquarium
       if (SongGrid.ItemsSource != null && _selectedSong != null) //&& selectedSong.FileName != _currentSong
       {
         Mplayer.Open(new Uri(_selectedSong.FileName));
-        //Console.WriteLine(selectedSong.FileName);
         Mplayer.Play();
+        Console.WriteLine(_selectedSong.FileName);
         _audioPlaying = true;
         GetAlbumart();
 
@@ -226,7 +227,7 @@ namespace Audioquarium
         Application.Current.MainWindow.Height = 80;
         Application.Current.MainWindow.Width = 400;
         Application.Current.MainWindow.Topmost = true;
-        ScrubTime.Visibility = Visibility.Hidden;
+        ScrubText.Visibility = Visibility.Hidden;
         ScrubPanel.Margin = new Thickness(160, 0, 20, 0);
         PlayerSizeRect.Fill = new VisualBrush
         {
@@ -271,7 +272,7 @@ namespace Audioquarium
         Application.Current.MainWindow.Width = 900;
         Application.Current.MainWindow.Topmost = false;
         ScrubPanel.Margin = new Thickness(175, 0, 20, 0);
-        ScrubTime.Visibility = Visibility.Visible;
+        ScrubText.Visibility = Visibility.Visible;
         PlayerSizeRect.Fill = new VisualBrush
         {
           Visual = (Visual) FindResource("appbar_shark"),
@@ -714,6 +715,7 @@ namespace Audioquarium
         if (_selectedSong != null)
         {
           Mplayer.Open(new Uri(_selectedSong.FileName));
+          Console.WriteLine(_selectedSong.FileName);
           Mplayer.Play();
           PlayPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
 
@@ -798,6 +800,7 @@ namespace Audioquarium
       {
         Mplayer.Open(new Uri(_selectedSong.FileName));
         Mplayer.Play();
+        Console.WriteLine(_selectedSong.FileName);
         GetAlbumart();
         PlayPause.OpacityMask = new VisualBrush {Visual = (Visual) FindResource("Pause")};
 
@@ -897,5 +900,22 @@ namespace Audioquarium
     }
 
     #endregion
+
+    private void ScrubBar_OnMouseMove(object sender, MouseEventArgs e)
+    {
+      Point currentPos = e.GetPosition(ScrubBar);
+      Track track = ScrubBar.Template.FindName("PART_Track", ScrubBar) as Track;
+
+      if (track != null)
+      {
+        GhostTime.Visibility = Visibility.Visible;
+        GhostTime.Content = TimeSpan.FromSeconds(track.ValueFromPoint(currentPos)).ToString(@"mm\:ss");
+      }
+    }
+
+    private void ScrubBar_OnMouseLeave(object sender, MouseEventArgs e)
+    {
+      GhostTime.Visibility = Visibility.Hidden;
+    }
   }
 }

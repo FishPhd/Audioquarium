@@ -363,12 +363,15 @@
       </StackPanel>
       <StackPanel x:Name="ScrubPanel" Margin="175,0,20,0" Width="Auto" Orientation="Vertical">
           <Label x:Name="NowPlayingSong" Margin="0,0,0,0">Song - Artist</Label>
-          <Slider x:Name="ScrubBar" IsMoveToPointEnabled="True" PreviewMouseUp="scrubBar_OnValueChanged"
-                  Thumb.DragStarted="Slider_DragStarted" Style="{DynamicResource FlatSlider}"
-                  Foreground="{DynamicResource AccentColorBrush}" Width="Auto" Height="10.3"
+        <Slider x:Name="ScrubBar" IsMoveToPointEnabled="True" PreviewMouseUp="scrubBar_OnValueChanged"
+                  Thumb.DragStarted="Slider_DragStarted" Style="{DynamicResource FlatSlider}" MouseMove="ScrubBar_OnMouseMove"
+                  Foreground="{DynamicResource AccentColorBrush}" Width="Auto" Height="10.3" MouseLeave="ScrubBar_OnMouseLeave"
                   TickFrequency="0.5" />
-        </StackPanel>
-      <Label HorizontalAlignment="Right" x:Name="ScrubTime" Margin="0,0,20,26">00:00 / 00:00</Label>
+      </StackPanel>
+      <StackPanel x:Name="ScrubText" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,20,25">
+        <Label HorizontalAlignment="Right" Opacity="0.5" x:Name="GhostTime"></Label>
+        <Label HorizontalAlignment="Right" x:Name="ScrubTime">00:00 / 00:00</Label>
+      </StackPanel>
     </Grid>
     <Grid Grid.Column="1" Grid.Row="0">
       <Label x:Name="NoLoadLabel" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource AccentColorBrush}" FontSize="16">Open settings to load songs</Label>
