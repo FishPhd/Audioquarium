@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using File = TagLib.File;
 
 namespace Audioquarium
@@ -10,7 +9,7 @@ namespace Audioquarium
   internal class Itemsource
   {
     public static readonly List<Songs> SongLibrary = new List<Songs>();
-    private static readonly string[] Filetypes = { "*.mp3", "*.wav", "*.aac", "*.flac", "*.wma" };
+    private static readonly string[] Filetypes = {"*.mp3", "*.wav", "*.aac", "*.flac", "*.wma"};
     private static string _songName;
     private static string _songArtist;
 
@@ -31,7 +30,7 @@ namespace Audioquarium
       {
         try
         {
-          File tagFile = File.Create(file);
+          var tagFile = File.Create(file);
 
           _songName = tagFile.Tag.Title ?? Path.GetFileNameWithoutExtension(file);
           _songArtist = tagFile.Tag.FirstAlbumArtist ?? tagFile.Tag.Performers[0];
@@ -69,7 +68,7 @@ namespace Audioquarium
         foreach (var directory in Directory.GetDirectories(path))
           files.AddRange(GetFiles(directory, pattern));
       }
-      catch 
+      catch
       {
         Console.WriteLine(@"Music directory is unable to be read. File access issue?");
       }

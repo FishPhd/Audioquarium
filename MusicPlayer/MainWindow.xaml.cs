@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -8,54 +7,54 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Forms.VisualStyles;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using Audioquarium.Properties;
+using Gma.System.MouseKeyHook;
 using MahApps.Metro;
 using MahApps.Metro.Controls;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Microsoft.WindowsAPICodePack.Shell.Interop;
-using MouseKeyboardActivityMonitor;
-using MouseKeyboardActivityMonitor.WinApi;
 using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
 using DataGrid = System.Windows.Controls.DataGrid;
 using File = TagLib.File;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using VerticalAlignment = System.Windows.VerticalAlignment;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace Audioquarium
 {
   public partial class MainWindow
   {
     public static readonly MediaPlayer Mplayer = new MediaPlayer();
-    private readonly KeyboardHookListener _mKeyboardListener;
     private readonly Random _rnd = new Random();
-    private bool _audioPlaying;
-    private bool _audioMuted;
-    private int _currentView; // Song(0) Album(1) Artist(2) 
-    private bool _dragStarted;
-    private int _playerSize = 2; // Guppy(0) Minnow(1) Shark(2) Whale(3)
-    private bool _repeatSong;
-    private readonly DispatcherTimer _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.5) };
-    private Itemsource.Songs _selectedSong;
-    private bool _shuffleSongs;
-    private bool _isWindowActive = true;
-    private string _keydata;
+    private readonly DispatcherTimer _timer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(0.5)};
     private int _albumCount;
     private int _artistCount;
+    private bool _audioMuted;
+    private bool _audioPlaying;
+    private int _currentView; // Song(0) Album(1) Artist(2) 
+    private bool _dragStarted;
+    private bool _isWindowActive = true;
+    private string _keydata;
+    private int _playerSize = 2; // Guppy(0) Minnow(1) Shark(2) Whale(3)
+    private bool _repeatSong;
+    private Itemsource.Songs _selectedSong;
+    private bool _shuffleSongs;
     private int _songCount;
+    private readonly Stopwatch _stopWatch = new Stopwatch();
+    private IKeyboardMouseEvents m_GlobalHook;
 
     public MainWindow()
     {
       InitializeComponent();
       Load();
 
-      _mKeyboardListener = new KeyboardHookListener(new GlobalHooker()) {Enabled = true};
-      _mKeyboardListener.KeyDown += HookManager_KeyDown;
+      m_GlobalHook = Hook.GlobalEvents();
+      m_GlobalHook.KeyDown += GlobalHook_KeyDown;
 
       _timer.Tick += timer_Tick;
       _timer.Start();
@@ -63,6 +62,9 @@ namespace Audioquarium
 
     private void timer_Tick(object sender, EventArgs e)
     {
+      if (_stopWatch.ElapsedMilliseconds > 100)
+        _stopWatch.Reset();
+
       if (Mplayer.Source != null && Mplayer.NaturalDuration.HasTimeSpan)
       {
         SongGrid.SelectedIndex = SongGrid.SelectedIndex;
@@ -113,11 +115,16 @@ namespace Audioquarium
       }
     }
 
-    private void HookManager_KeyDown(object sender, KeyEventArgs e)
+    private void GlobalHook_KeyDown(object sender, KeyEventArgs e)
     {
+      if (_stopWatch.ElapsedMilliseconds < 50 && _stopWatch.IsRunning)
+      {
+        _stopWatch.Reset();
+        return;
+      }
       _keydata = e.KeyData.ToString();
       _isWindowActive = Application.Current.MainWindow.IsActive;
-      if (_keydata  == Key.MediaPlayPause.ToString() || _keydata == Key.Play.ToString() || (_isWindowActive && _keydata == Key.Space.ToString()))
+      if (_keydata == Key.MediaPlayPause.ToString() || _keydata == Key.Play.ToString() || (_isWindowActive && _keydata == Key.Space.ToString()))
         Play();
       else if (_keydata == Key.MediaNextTrack.ToString() || _keydata == Key.Next.ToString() || (_isWindowActive && _keydata == Key.Right.ToString()))
         Next();
@@ -125,14 +132,15 @@ namespace Audioquarium
         Previous();
       else if (_keydata == Key.VolumeMute.ToString())
         Mute();
+      _stopWatch.Restart();
     }
 
     public void Load()
     {
       var song = Itemsource.SongLibrary;
-      if (Properties.Settings.Default.MusicDirectory != "") // Check if music directory is empty
+      if (Settings.Default.MusicDirectory != "") // Check if music directory is empty
       {
-        _songCount = Itemsource.LoadSongs(Properties.Settings.Default.MusicDirectory);
+        _songCount = Itemsource.LoadSongs(Settings.Default.MusicDirectory);
         SongGrid.ItemsSource = Itemsource.SongLibrary;
         SongGrid.Items.Refresh();
         NoLoadLabel.Visibility = Visibility.Hidden;
@@ -143,10 +151,10 @@ namespace Audioquarium
         SongGrid.ItemsSource = null;
       }
       // Get the color they had
-      ThemeManager.ChangeAppStyle(Application.Current, ThemeManager.GetAccent(Properties.Settings.Default.PlayerColor),
+      ThemeManager.ChangeAppStyle(Application.Current, ThemeManager.GetAccent(Settings.Default.PlayerColor),
         ThemeManager.GetAppTheme("BaseDark"));
-      Colors.SelectedValue = Properties.Settings.Default.PlayerColor; // Color setting set to color (dictionaries.s)
-      Directory1Text.Text = Properties.Settings.Default.MusicDirectory; // Music directory set to music directory (or empty string)
+      Colors.SelectedValue = Settings.Default.PlayerColor; // Color setting set to color (dictionaries.s)
+      Directory1Text.Text = Settings.Default.MusicDirectory; // Music directory set to music directory (or empty string)
 
       var albums = song.GroupBy(x => x.Album).Select(x => x.First()).ToList();
       var artists = Itemsource.SongLibrary.GroupBy(x => x.Artist).Select(x => x.First()).ToList();
@@ -240,7 +248,7 @@ namespace Audioquarium
         SongGrid.Columns[2].Width = 175;
         SongGrid.Columns[3].Width = 30;
         SongGrid.Columns[4].Width = new DataGridLength(1, DataGridLengthUnitType.Auto);
-        
+
         PlayerSizeRect.Fill = new VisualBrush
         {
           Visual = (Visual) FindResource("appbar_shark"),
@@ -289,7 +297,7 @@ namespace Audioquarium
         RightMainColumn.Width = new GridLength(2, GridUnitType.Star);
         SongGrid.HeadersVisibility = DataGridHeadersVisibility.All;
 
-        for (int i = 0; i < SongGrid.Columns.Count - 1; i++)
+        for (var i = 0; i < SongGrid.Columns.Count - 1; i++)
         {
           SongGrid.Columns[i].Width = new DataGridLength(1, DataGridLengthUnitType.Star);
         }
@@ -347,7 +355,7 @@ namespace Audioquarium
 
     private void PlayerSettings_OnClick(object sender, RoutedEventArgs e)
     {
-      if(Flyout.IsOpen)
+      if (Flyout.IsOpen)
         FlyoutHandler(SettingsGrid, "Settings", true);
       else
         FlyoutHandler(SettingsGrid, "Settings");
@@ -366,8 +374,8 @@ namespace Audioquarium
       NowPlayingAlbum.Text = "Album";
       NowPlayingTrack.Text = "Track";
       NowPlayingSong.Content = "Song - Artist";
-      Properties.Settings.Default.MusicDirectory = "";
-      Properties.Settings.Default.Save();
+      Settings.Default.MusicDirectory = "";
+      Settings.Default.Save();
       Load();
     }
 
@@ -394,8 +402,8 @@ namespace Audioquarium
         ArtistSortingLabel.Foreground = (Brush) FindResource("AccentColorBrush");
       }
 
-      Properties.Settings.Default.PlayerColor = Colors.SelectedValue.ToString();
-      Properties.Settings.Default.Save();
+      Settings.Default.PlayerColor = Colors.SelectedValue.ToString();
+      Settings.Default.Save();
     }
 
     #endregion
@@ -430,9 +438,9 @@ namespace Audioquarium
 
       if (result == CommonFileDialogResult.Ok)
       {
-        Properties.Settings.Default.MusicDirectory = Convert.ToString(dialog.FileName);
-        Properties.Settings.Default.Save();
-        Directory1Text.Text = Properties.Settings.Default.MusicDirectory;
+        Settings.Default.MusicDirectory = Convert.ToString(dialog.FileName);
+        Settings.Default.Save();
+        Directory1Text.Text = Settings.Default.MusicDirectory;
         Load();
       }
     }
@@ -944,7 +952,7 @@ namespace Audioquarium
     {
       if (_playerSize > 1)
       {
-        Track track = ScrubBar.Template.FindName("PART_Track", ScrubBar) as Track;
+        var track = ScrubBar.Template.FindName("PART_Track", ScrubBar) as Track;
 
         if (track != null)
         {
@@ -967,11 +975,9 @@ namespace Audioquarium
 
     private void MainWindow_OnClosed(object sender, EventArgs e)
     {
-      Properties.Settings.Default.Save();
+      Settings.Default.Save();
     }
 
     #endregion
-
-
   }
 }

@@ -1,9 +1,10 @@
 ﻿<controls:MetroWindow x:Class="Audioquarium.MainWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro" AllowsTransparency="True"
+                      xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      AllowsTransparency="True"
                       xmlns:local="clr-namespace:Audioquarium" ResizeMode="CanMinimize" Closed="MainWindow_OnClosed"
-                      Title="Audioquarium" Height="549" MinHeight="80" MinWidth="185" Width="900"> 
+                      Title="Audioquarium" Height="549" MinHeight="80" MinWidth="185" Width="900">
   <controls:MetroWindow.Resources>
     <ObjectDataProvider x:Key="Color" ObjectType="{x:Type local:Dictionaries}" MethodName="GetColor" />
   </controls:MetroWindow.Resources>
@@ -56,7 +57,7 @@
               <Label>Music Directory:</Label>
               <TextBox x:Name="Directory1Text" IsReadOnly="True" controls:TextBoxHelper.Watermark="None"
                        Margin="10,0,0,0"
-                       Height="20" Width="200"/>
+                       Height="20" Width="200" />
               <Button Style="{StaticResource AccentedSquareButtonStyle}" x:Name="Directory1"
                       controls:ButtonHelper.PreserveTextCase="True" Height="30" Width="70"
                       Click="btnChange_OnClick" Margin="15,0,10,0" Content="Change"
@@ -97,7 +98,7 @@
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
       <ColumnDefinition x:Name="LeftMainColumn" Width="1*" />
-      <ColumnDefinition   x:Name="RightMainColumn" Width="2*" />
+      <ColumnDefinition x:Name="RightMainColumn" Width="2*" />
     </Grid.ColumnDefinitions>
 
     <Grid x:Name="AlbumGrid">
@@ -362,25 +363,33 @@
         </Rectangle>
       </StackPanel>
       <StackPanel x:Name="ScrubPanel" Margin="175,0,20,0" Width="Auto" Orientation="Vertical">
-          <Label x:Name="NowPlayingSong" Margin="0,0,79,0">Song - Artist</Label>
-        <Slider x:Name="ScrubBar" IsMoveToPointEnabled="False" PreviewMouseDown="ScrubBar_OnMouseDown" PreviewMouseUp="scrubBar_OnValueChanged"
-                  Thumb.DragStarted="Slider_DragStarted" Style="{DynamicResource FlatSlider}" MouseMove="ScrubBar_OnMouseMove" Focusable="False"
-                  Foreground="{DynamicResource AccentColorBrush}" Width="Auto" Height="10.3" MouseLeave="ScrubBar_OnMouseLeave" 
-                  TickFrequency="0.5" />
+        <Label x:Name="NowPlayingSong" Margin="0,0,79,0">Song - Artist</Label>
+        <Slider x:Name="ScrubBar" IsMoveToPointEnabled="False" PreviewMouseDown="ScrubBar_OnMouseDown"
+                PreviewMouseUp="scrubBar_OnValueChanged"
+                Thumb.DragStarted="Slider_DragStarted" Style="{DynamicResource FlatSlider}"
+                MouseMove="ScrubBar_OnMouseMove" Focusable="False"
+                Foreground="{DynamicResource AccentColorBrush}" Width="Auto" Height="10.3"
+                MouseLeave="ScrubBar_OnMouseLeave"
+                TickFrequency="0.5" />
       </StackPanel>
       <StackPanel x:Name="ScrubText" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,20,25">
-        <Label HorizontalAlignment="Right" Opacity="0.5" x:Name="GhostTime"></Label>
+        <Label HorizontalAlignment="Right" Opacity="0.5" x:Name="GhostTime" />
         <Label HorizontalAlignment="Right" x:Name="ScrubTime">00:00 / 00:00</Label>
       </StackPanel>
     </Grid>
     <Grid Grid.Column="1" Grid.Row="0">
-      <Label x:Name="NoLoadLabel" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{DynamicResource AccentColorBrush}" FontSize="16">Open settings to load songs</Label>
-      <DataGrid HorizontalScrollBarVisibility="Disabled" x:Name="SongGrid" CanUserResizeColumns="False" CanUserReorderColumns="False" Focusable="False"
-                CanUserResizeRows="False" MouseLeftButtonDown="SongGrid_OnLeftButtonDown" PreviewKeyDown="SongGrid_OnPreviewKeyDown"
+      <Label x:Name="NoLoadLabel" VerticalAlignment="Center" HorizontalAlignment="Center"
+             Foreground="{DynamicResource AccentColorBrush}" FontSize="16">
+        Open settings to load songs
+      </Label>
+      <DataGrid HorizontalScrollBarVisibility="Disabled" x:Name="SongGrid" CanUserResizeColumns="False"
+                CanUserReorderColumns="False" Focusable="False"
+                CanUserResizeRows="False" MouseLeftButtonDown="SongGrid_OnLeftButtonDown"
+                PreviewKeyDown="SongGrid_OnPreviewKeyDown"
                 IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="None"
-                Style="{StaticResource AzureDataGrid}" VerticalAlignment="Top"> 
+                Style="{StaticResource AzureDataGrid}" VerticalAlignment="Top">
         <DataGrid.Columns>
-          <DataGridTextColumn  MinWidth="120" Width="175" Header="Song" Binding="{Binding Name}" />
+          <DataGridTextColumn MinWidth="120" Width="175" Header="Song" Binding="{Binding Name}" />
           <DataGridTextColumn MinWidth="100" Width="150" Header="Artist" Binding="{Binding Artist}" />
           <DataGridTextColumn Width="175" Header="Album" Binding="{Binding Album}" />
           <DataGridTextColumn Width="30" Header="Track" Binding="{Binding Track}" />
