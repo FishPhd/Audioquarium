@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using File = TagLib.File;
 
 namespace Audioquarium
@@ -9,80 +10,42 @@ namespace Audioquarium
   internal class Itemsource
   {
     public static readonly List<Songs> SongLibrary = new List<Songs>();
+    private static readonly string[] Filetypes = { "*.mp3", "*.wav", "*.aac", "*.flac", "*.wma" };
+    private static string _songName;
+    private static string _songArtist;
 
-    public static void LoadSongs(string path)
+    public static int LoadSongs(string path)
     {
       var watch = new Stopwatch();
       watch.Start();
 
       SongLibrary?.Clear();
 
-      var filetypes = new[] {"*.mp3", "*.wav", "*.aac", "*.flac", "*.wma"};
       var songCount = 0;
-
       var files = new List<string>();
 
-      foreach (var t in filetypes)
+      foreach (var t in Filetypes)
         files.AddRange(GetFiles(path, t));
 
       foreach (var file in files)
       {
         try
         {
-          var tagFile = File.Create(file);
+          File tagFile = File.Create(file);
 
-          if (tagFile.Tag.Title == null)
+          _songName = tagFile.Tag.Title ?? Path.GetFileNameWithoutExtension(file);
+          _songArtist = tagFile.Tag.FirstAlbumArtist ?? tagFile.Tag.Performers[0];
+
+          SongLibrary?.Add(new Songs
           {
-            SongLibrary?.Add(new Songs
-            {
-              Name = Path.GetFileNameWithoutExtension(file),
-              Artist = tagFile.Tag.FirstAlbumArtist,
-              Album = tagFile.Tag.Album,
-              Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
-              Track = tagFile.Tag.Track.ToString(),
-              FileName = tagFile.Name,
-              AltName = Path.GetFileNameWithoutExtension(file)
-            });
-          }
-          else if (tagFile.Tag.FirstAlbumArtist == null)
-          {
-            SongLibrary?.Add(new Songs
-            {
-              Name = Path.GetFileNameWithoutExtension(file),
-              Artist = tagFile.Tag.Performers[0],
-              Album = tagFile.Tag.Album,
-              Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
-              Track = tagFile.Tag.Track.ToString(),
-              FileName = tagFile.Name,
-              AltName = Path.GetFileNameWithoutExtension(file)
-            });
-          }
-          else if (tagFile.Tag.FirstAlbumArtist == null && tagFile.Tag.Title == null)
-          {
-            SongLibrary?.Add(new Songs
-            {
-              Name = Path.GetFileNameWithoutExtension(file),
-              Artist = tagFile.Tag.Performers[0],
-              Album = tagFile.Tag.Album,
-              Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
-              Track = tagFile.Tag.Track.ToString(),
-              FileName = tagFile.Name,
-              AltName = Path.GetFileNameWithoutExtension(file)
-            });
-          }
-          else
-          {
-            SongLibrary?.Add(new Songs
-            {
-              Name = tagFile.Tag.Title,
-              Artist = tagFile.Tag.FirstAlbumArtist,
-              Album = tagFile.Tag.Album,
-              Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
-              Track = tagFile.Tag.Track.ToString(),
-              FileName = tagFile.Name,
-              AltName = Path.GetFileNameWithoutExtension(file)
-            });
-          }
+            Name = _songName,
+            Artist = _songArtist,
+            Album = tagFile.Tag.Album,
+            Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
+            Track = tagFile.Tag.Track.ToString(),
+            FileName = tagFile.Name,
+            AltName = Path.GetFileNameWithoutExtension(file)
+          });
           songCount++;
         }
         catch
@@ -93,15 +56,23 @@ namespace Audioquarium
 
       watch.Stop();
       Console.WriteLine(songCount + @" songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
+      return songCount;
     }
 
     private static List<string> GetFiles(string path, string pattern)
     {
       var files = new List<string>();
 
-      files.AddRange(Directory.GetFiles(path, pattern, SearchOption.TopDirectoryOnly));
-      foreach (var directory in Directory.GetDirectories(path))
-        files.AddRange(GetFiles(directory, pattern));
+      try
+      {
+        files.AddRange(Directory.GetFiles(path, pattern, SearchOption.TopDirectoryOnly));
+        foreach (var directory in Directory.GetDirectories(path))
+          files.AddRange(GetFiles(directory, pattern));
+      }
+      catch 
+      {
+        Console.WriteLine(@"Music directory is unable to be read. File access issue?");
+      }
 
       return files;
     }

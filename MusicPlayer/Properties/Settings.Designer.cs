@@ -22,5 +22,29 @@ namespace Audioquarium.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MusicDirectory {
+            get {
+                return ((string)(this["MusicDirectory"]));
+            }
+            set {
+                this["MusicDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("blue")]
+        public string PlayerColor {
+            get {
+                return ((string)(this["PlayerColor"]));
+            }
+            set {
+                this["PlayerColor"] = value;
+            }
+        }
     }
 }
