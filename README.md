@@ -1,4 +1,4 @@
-<img src="http://i.imgur.com/LjplVc8.png" width="120">
+<img src="http://i.imgur.com/vrbcYwa.png" width="120">
 
 ## Super Lightweight Audio Player, No BS
 
