@@ -40,7 +40,8 @@ namespace Audioquarium
             Name = _songName,
             Artist = _songArtist,
             Album = tagFile.Tag.Album,
-            Length = tagFile.Properties.Duration.ToString(@"mm\:ss"),
+            Length = tagFile.Properties.Duration.TotalSeconds,
+            Duration = TimeSpan.FromSeconds(tagFile.Properties.Duration.TotalSeconds).ToString(@"mm\:ss"),
             Track = tagFile.Tag.Track.ToString(),
             FileName = tagFile.Name,
             AltName = Path.GetFileNameWithoutExtension(file)
@@ -82,7 +83,8 @@ namespace Audioquarium
       public string Artist { get; set; }
       public string Album { get; set; }
       public string Track { get; set; }
-      public string Length { get; set; }
+      public double Length { get; set; }
+      public string Duration { get; set; }
       public string FileName { get; set; }
       public string AltName { get; set; }
     }

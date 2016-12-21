@@ -10,16 +10,16 @@
   </controls:MetroWindow.Resources>
   <controls:MetroWindow.LeftWindowCommands>
     <controls:WindowCommands>
-      <Button Click="ShrinkButton_Click" ToolTip="Shrink Player">
-        <Rectangle x:Name="ShrinkButton" Width="10" Height="10"
+      <Button x:Name="ShrinkButton" Click="ShrinkButton_Click" ToolTip="Shrink Player">
+        <Rectangle  Width="10" Height="10"
                    Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
           <Rectangle.OpacityMask>
             <VisualBrush Stretch="Uniform" Visual="{StaticResource appbar_minus}" />
           </Rectangle.OpacityMask>
         </Rectangle>
       </Button>
-      <Button Click="ExpandButton_Click" ToolTip="Expand Player">
-        <Rectangle x:Name="ExpandButton" Width="10" Height="10"
+      <Button x:Name="ExpandButton" Click="ExpandButton_Click" ToolTip="Expand Player" Visibility="Collapsed">
+        <Rectangle  Width="10" Height="10"
                    Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
           <Rectangle.OpacityMask>
             <VisualBrush Stretch="Uniform" Visual="{StaticResource appbar_add}" />
@@ -133,7 +133,7 @@
             </Button.Style>
             <Button.Content>
               <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
-                <Grid Visibility="Hidden" x:Name="AlbumsSelector" Opacity="0.7" Width="3" Margin="5,0,0,0" Height="35"
+                <Grid Visibility="Hidden" x:Name="AlbumsSelector" Opacity="0.7" Width="2" Margin="5,0,0,0" Height="35"
                       Background="{DynamicResource AccentColorBrush}" />
                 <Rectangle x:Name="AlbumSortingIcon" Width="25" Height="35" Margin="13,0,0,0"
                            Fill="{DynamicResource GrayBrush6}">
@@ -173,7 +173,7 @@
             </Button.Style>
             <Button.Content>
               <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
-                <Grid Visibility="Hidden" x:Name="ArtistsSelector" Width="3" Opacity="0.7" Margin="5,0,0,0" Height="35"
+                <Grid Visibility="Hidden" x:Name="ArtistsSelector" Width="2" Opacity="0.7" Margin="5,0,0,0" Height="35"
                       Background="{DynamicResource AccentColorBrush}" />
                 <Rectangle x:Name="ArtistSortingIcon" Width="30" Height="30" Margin="10,0,0,0"
                            Fill="{DynamicResource GrayBrush6}">
@@ -213,7 +213,7 @@
             </Button.Style>
             <Button.Content>
               <StackPanel Orientation="Horizontal" Height="50" Margin="5,0,0,0">
-                <Grid x:Name="SongsSelector" Width="3" Margin="5,0,0,0" Height="35" Opacity="0.7"
+                <Grid x:Name="SongsSelector" Width="2" Margin="5,0,0,0" Height="35" Opacity="0.7"
                       Background="{DynamicResource AccentColorBrush}" />
                 <Rectangle x:Name="SongSortingIcon" Width="25" Height="30" Margin="10,0,0,0"
                            Fill="{DynamicResource AccentColorBrush}">
@@ -230,10 +230,11 @@
           </Button>
         </StackPanel>
       </Grid>
-      <Grid x:Name="AlbumArtToolTip" Grid.Row="1" MouseDown="AlbumArt_MouseDown">
+      <Grid x:Name="AlbumArtToolTip" Grid.Row="1" MouseEnter="AlbumArtToolTip_OnMouseEnter" MouseLeave="AlbumArtToolTip_OnMouseLeave" MouseDown="AlbumArt_MouseDown">
         <Viewbox Stretch="Uniform" MinHeight="297">
           <Image x:Name="AlbumArt" VerticalAlignment="Bottom" />
         </Viewbox>
+        <Rectangle x:Name="BrightenArt" Opacity="0.1" Fill="White" Visibility="Hidden"/>
         <Rectangle x:Name="Placeholder" VerticalAlignment="Center" HorizontalAlignment="Center" Width="125"
                    Height="150" Margin="0,0,20,0"
                    Fill="{DynamicResource AccentColorBrush}">
@@ -329,7 +330,7 @@
             </Style>
           </Rectangle.Style>
         </Rectangle>
-        <Rectangle x:Name="PlayPause" Width="15" Height="20" Margin="30,15,0,0" VerticalAlignment="Top"
+        <Rectangle x:Name="PlayPauseButton" Width="15" Height="20" Margin="30,15,0,0" VerticalAlignment="Top"
                    ToolTip="Play/Pause" MouseDown="PlayPause_OnClick">
           <Rectangle.OpacityMask>
             <VisualBrush Visual="{StaticResource Play}" />
@@ -369,12 +370,12 @@
                 Thumb.DragStarted="Slider_DragStarted" Style="{DynamicResource FlatSlider}"
                 MouseMove="ScrubBar_OnMouseMove" Focusable="False"
                 Foreground="{DynamicResource AccentColorBrush}" Width="Auto" Height="10.3"
-                MouseLeave="ScrubBar_OnMouseLeave"
-                TickFrequency="0.5" />
+                MouseLeave="ScrubBar_OnMouseLeave" Maximum="0.1" LargeChange="0.1" />
       </StackPanel>
       <StackPanel x:Name="ScrubText" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,20,25">
-        <Label HorizontalAlignment="Right" Opacity="0.5" x:Name="GhostTime" />
-        <Label HorizontalAlignment="Right" x:Name="ScrubTime">00:00 / 00:00</Label>
+        <Label HorizontalAlignment="Right" Opacity="0.5" Visibility="Collapsed" x:Name="GhostTime" />
+        <Label HorizontalAlignment="Right" x:Name="CurrentScrubTime" Margin="0,0,-5,0">00:00</Label>
+        <Label HorizontalAlignment="Right" x:Name="TotalScrubTime">- 00:00</Label>
       </StackPanel>
     </Grid>
     <Grid Grid.Column="1" Grid.Row="0">
@@ -383,19 +384,19 @@
         Open settings to load songs
       </Label>
       <DataGrid HorizontalScrollBarVisibility="Disabled" x:Name="SongGrid" CanUserResizeColumns="False"
-                CanUserReorderColumns="False" Focusable="False"
-                CanUserResizeRows="False" MouseLeftButtonDown="SongGrid_OnLeftButtonDown"
-                PreviewKeyDown="SongGrid_OnPreviewKeyDown"
-                IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="None"
-                Style="{StaticResource AzureDataGrid}" VerticalAlignment="Top">
+                CanUserReorderColumns="False" Focusable="False" CanUserSortColumns="False"
+                CanUserResizeRows="False" PreviewMouseDown="SongGrid_OnPreviewMouseDown"
+                PreviewKeyDown="SongGrid_OnPreviewKeyDown" HorizontalAlignment="Center"
+                IsReadOnly="True" AutoGenerateColumns="False" VerticalAlignment="Top" ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle}">
         <DataGrid.Columns>
-          <DataGridTextColumn MinWidth="120" Width="175" Header="Song" Binding="{Binding Name}" />
+          <DataGridTextColumn MinWidth="150" Width="175" Header="Song" Binding="{Binding Name}"/>
           <DataGridTextColumn MinWidth="100" Width="150" Header="Artist" Binding="{Binding Artist}" />
-          <DataGridTextColumn Width="175" Header="Album" Binding="{Binding Album}" />
-          <DataGridTextColumn Width="30" Header="Track" Binding="{Binding Track}" />
-          <DataGridTextColumn Width="*" Header="Length" Binding="{Binding Length}" />
+          <DataGridTextColumn Width="170" Header="Album" Binding="{Binding Album}" />
+          <DataGridTextColumn Width="20" Header="#" Binding="{Binding Track}" />
+          <DataGridTextColumn Width="*" Header="Length" Binding="{Binding Duration}" />
         </DataGrid.Columns>
       </DataGrid>
+
       <ScrollViewer x:Name="ScrollViewer" Visibility="Hidden" HorizontalScrollBarVisibility="Disabled"
                     VerticalScrollBarVisibility="Auto">
         <WrapPanel x:Name="WrapPanel" Margin="10,10,10,0" />
