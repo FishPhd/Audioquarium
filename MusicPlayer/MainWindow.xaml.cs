@@ -119,14 +119,28 @@ namespace Audioquarium
       }
       _keydata = e.KeyData.ToString();
       _isWindowActive = Application.Current.MainWindow.IsActive;
-      if (_keydata == Key.MediaPlayPause.ToString() || _keydata == Key.Play.ToString() || (_isWindowActive && _keydata == Key.Space.ToString()))
-        PlayOrPause();
-      else if (_keydata == Key.MediaNextTrack.ToString() || _keydata == Key.Next.ToString() || (_isWindowActive && _keydata == Key.Right.ToString()))
-        Next();
-      else if (_keydata == Key.MediaPreviousTrack.ToString() || (_isWindowActive && _keydata == Key.Left.ToString()))
-        Previous();
-      else if (_keydata == Key.VolumeMute.ToString())
-        Mute();
+      if (!SearchBox.IsFocused)
+      {
+        if (_keydata == Key.MediaPlayPause.ToString() || _keydata == Key.Play.ToString() || (_isWindowActive && _keydata == Key.Space.ToString()))
+          PlayOrPause();
+        else if (_keydata == Key.MediaNextTrack.ToString() || _keydata == Key.Next.ToString() || (_isWindowActive && _keydata == Key.Right.ToString()))
+          Next();
+        else if (_keydata == Key.MediaPreviousTrack.ToString() || (_isWindowActive && _keydata == Key.Left.ToString()))
+          Previous();
+        else if (_keydata == Key.VolumeMute.ToString())
+          Mute();
+      }
+      else
+      {
+        if (_keydata == Key.MediaPlayPause.ToString())
+          PlayOrPause();
+        else if (_keydata == Key.MediaNextTrack.ToString())
+          Next();
+        else if (_keydata == Key.MediaPreviousTrack.ToString())
+          Previous();
+        else if (_keydata == Key.VolumeMute.ToString())
+          Mute();
+      }
       _stopWatch.Restart();
     }
 
@@ -138,7 +152,7 @@ namespace Audioquarium
         _songCount = Itemsource.LoadSongs(Settings.Default.MusicDirectory);
         SongGrid.ItemsSource = Itemsource.SongLibrary;
         SongGrid.Items.Refresh();
-        NoLoadLabel.Visibility = Visibility.Hidden;
+        NoLoadLabel.Visibility = Visibility.Collapsed;
       }
       else // Empty setting load nothing (saves a load error)
       {
@@ -446,6 +460,7 @@ namespace Audioquarium
 
         SongGrid.Visibility = Visibility.Visible;
         ScrollViewer.Visibility = Visibility.Hidden;
+        SearchBox.Visibility = Visibility.Visible;
         watch.Stop();
         Console.WriteLine(@"Songs loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
       }
@@ -462,7 +477,6 @@ namespace Audioquarium
         GridSort("Album", SongGrid);
         _currentView = 1; // Set our view to album grid
 
-        //albumSorting.Background = Brushes.LightGray;
         AlbumSortingIcon.Fill = (Brush) FindResource("AccentColorBrush");
         AlbumSortingLabel.Foreground = (Brush) FindResource("AccentColorBrush");
 
@@ -479,6 +493,7 @@ namespace Audioquarium
 
         SongGrid.Visibility = Visibility.Hidden;
         ScrollViewer.Visibility = Visibility.Visible;
+        SearchBox.Visibility = Visibility.Collapsed;
         watch.Stop();
         Console.WriteLine(_albumCount + @" albums and art loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
       }
@@ -495,7 +510,6 @@ namespace Audioquarium
         _currentView = 2; // Set our view to artist grid
         GridSort("Artist", SongGrid);
 
-        //albumSorting.Background = Brushes.LightGray;
         ArtistSortingIcon.Fill = (Brush) FindResource("AccentColorBrush");
         ArtistSortingLabel.Foreground = (Brush) FindResource("AccentColorBrush");
 
@@ -512,6 +526,7 @@ namespace Audioquarium
 
         SongGrid.Visibility = Visibility.Hidden;
         ScrollViewer.Visibility = Visibility.Visible;
+        SearchBox.Visibility = Visibility.Collapsed;
         watch.Stop();
         Console.WriteLine(_artistCount + @" artists loaded in " + watch.ElapsedMilliseconds + @" milliseconds");
       }
@@ -638,6 +653,7 @@ namespace Audioquarium
       }
       ScrollViewer.Visibility = Visibility.Hidden;
       SongGrid.Visibility = Visibility.Visible;
+      SearchBox.Visibility = Visibility.Visible;
     }
 
     private void AlbumArt_MouseDown(object sender, MouseButtonEventArgs e)
@@ -669,6 +685,7 @@ namespace Audioquarium
 
       SongGrid.Visibility = Visibility.Visible;
       ScrollViewer.Visibility = Visibility.Hidden;
+      SearchBox.Visibility = Visibility.Visible;
     }
 
     private void Artist_OnClick(object sender, RoutedEventArgs e)
@@ -718,8 +735,9 @@ namespace Audioquarium
       ScrollViewer.Visibility = Visibility.Hidden;
       _currentView = -1;
       SongGrid.Visibility = Visibility.Visible;
+      SearchBox.Visibility = Visibility.Visible;
     }
-    
+
     private void PlayOrPause()
     {
       if (_selectedSong == null && !_audioPlaying) // If no song is selected play the first one in the list
@@ -785,8 +803,11 @@ namespace Audioquarium
       {
         if (Mplayer.Position.TotalSeconds > 3)
           SongGrid.SelectedIndex = SongGrid.SelectedIndex;
-        else
+        else if (SongGrid.SelectedIndex != -1)
           SongGrid.SelectedIndex = SongGrid.SelectedIndex - 1;
+        else
+          return;
+
 
         _selectedSong = SongGrid.SelectedItem as Itemsource.Songs;
 
@@ -946,6 +967,17 @@ namespace Audioquarium
     private void AlbumArtToolTip_OnMouseLeave(object sender, MouseEventArgs e)
     {
       BrightenArt.Visibility = Visibility.Hidden;
+    }
+
+    private void SearchBox_TextChanged(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+      bool textDeleted = false;
+      var filterTextBox = (TextBox)sender;
+      var filterText = filterTextBox.Text;
+      if (e.Key == Key.Delete || e.Key == Key.Back)
+        textDeleted = true;
+
+      Itemsource.SetRowVisibilityByFilterText(filterText, SongGrid, textDeleted);
     }
   }
 }

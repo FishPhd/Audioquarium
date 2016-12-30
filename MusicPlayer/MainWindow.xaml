@@ -111,7 +111,7 @@
         <StackPanel Orientation="Vertical">
           <Button x:Name="AlbumSorting" Foreground="LightGray" Height="57"
                   controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
-                  BorderBrush="{x:Null}" Click="AlbumSorting_OnClick" ToolTip="Sort by Album Name">
+                  BorderBrush="{x:Null}" Click="AlbumSorting_OnClick" ToolTip="Sort by Album Name" BorderThickness="0">
             <Button.Style>
               <Style TargetType="{x:Type Button}">
                 <Setter Property="Background" Value="#FF252525" />
@@ -151,7 +151,7 @@
 
           <Button x:Name="ArtistSorting" Height="57" controls:ButtonHelper.PreserveTextCase="True"
                   HorizontalContentAlignment="Left"
-                  BorderBrush="{x:Null}" Click="ArtistSorting_OnClick" ToolTip="Sort by Artist Name">
+                  BorderBrush="{x:Null}" Click="ArtistSorting_OnClick" ToolTip="Sort by Artist Name" BorderThickness="0">
             <Button.Style>
               <Style TargetType="{x:Type Button}">
                 <Setter Property="Background" Value="#FF252525" />
@@ -191,7 +191,7 @@
           <Button Foreground="{DynamicResource AccentColorBrush}" x:Name="SongSorting" Height="56"
                   Click="SongSorting_OnClick"
                   controls:ButtonHelper.PreserveTextCase="True" HorizontalContentAlignment="Left"
-                  BorderBrush="{x:Null}" ToolTip="Sort by Song Name">
+                  BorderBrush="{x:Null}" ToolTip="Sort by Song Name" BorderThickness="0">
             <Button.Style>
               <Style TargetType="{x:Type Button}">
                 <Setter Property="Background" Value="#FF252525" />
@@ -383,20 +383,20 @@
              Foreground="{DynamicResource AccentColorBrush}" FontSize="16">
         Open settings to load songs
       </Label>
-      <DataGrid HorizontalScrollBarVisibility="Disabled" x:Name="SongGrid" CanUserResizeColumns="False"
-                CanUserReorderColumns="False" Focusable="False" CanUserSortColumns="False"
-                CanUserResizeRows="False" PreviewMouseDown="SongGrid_OnPreviewMouseDown"
-                PreviewKeyDown="SongGrid_OnPreviewKeyDown" HorizontalAlignment="Center"
+      <TextBox x:Name="SearchBox" BorderBrush="{DynamicResource AccentColorBrush}" Margin="0,2,14,0" controls:TextBoxHelper.Watermark="Search" KeyUp="SearchBox_TextChanged" Height="25" VerticalAlignment="Top" BorderThickness="0,0,0,1"></TextBox>
+      <DataGrid HorizontalScrollBarVisibility="Disabled" x:Name="SongGrid" CanUserResizeColumns="False" 
+                CanUserReorderColumns="False" Focusable="False" CanUserSortColumns="False" Height="Auto" Margin="0,28,0,0"
+                CanUserResizeRows="False" PreviewMouseDown="SongGrid_OnPreviewMouseDown" EnableColumnVirtualization="False" EnableRowVirtualization="False"
+                PreviewKeyDown="SongGrid_OnPreviewKeyDown" HorizontalAlignment="Center" SelectionMode="Single"
                 IsReadOnly="True" AutoGenerateColumns="False" VerticalAlignment="Top" ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle}">
         <DataGrid.Columns>
-          <DataGridTextColumn MinWidth="150" Width="175" Header="Song" Binding="{Binding Name}"/>
-          <DataGridTextColumn MinWidth="100" Width="150" Header="Artist" Binding="{Binding Artist}" />
-          <DataGridTextColumn Width="170" Header="Album" Binding="{Binding Album}" />
-          <DataGridTextColumn Width="20" Header="#" Binding="{Binding Track}" />
-          <DataGridTextColumn Width="*" Header="Length" Binding="{Binding Duration}" />
+          <DataGridTextColumn MinWidth="150" Width="175" Header="Song" Binding="{Binding Name, IsAsync=True}"/>
+          <DataGridTextColumn MinWidth="100" Width="150" Header="Artist" Binding="{Binding Artist, IsAsync=True}" />
+          <DataGridTextColumn Width="170" Header="Album" Binding="{Binding Album, IsAsync=True}" />
+          <DataGridTextColumn Width="20" Header="#" Binding="{Binding Track, IsAsync=True}" />
+          <DataGridTextColumn Width="*" Header="Length" Binding="{Binding Duration, IsAsync=True}" />
         </DataGrid.Columns>
       </DataGrid>
-
       <ScrollViewer x:Name="ScrollViewer" Visibility="Hidden" HorizontalScrollBarVisibility="Disabled"
                     VerticalScrollBarVisibility="Auto">
         <WrapPanel x:Name="WrapPanel" Margin="10,10,10,0" />
